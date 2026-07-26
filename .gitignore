@@ -1,0 +1,16 @@
+## .NET
+bin/
+obj/
+*.user
+
+## Visual Studio / Rider
+.vs/
+.idea/
+*.suo
+
+## Test results
+[Tt]est[Rr]esult*/
+coverage/
+
+## Scriptorium runtime data (user projects live outside the repo)
+*.scriv/

@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{498A575E-9020-4A5F-93A1-349B1FECF814}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scriptorium.Domain", "src\Scriptorium.Domain\Scriptorium.Domain.csproj", "{4A219469-8712-4270-B412-C6C514CC5B4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scriptorium.Data", "src\Scriptorium.Data\Scriptorium.Data.csproj", "{D8286879-3450-4FD7-83D7-35C5A5159878}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scriptorium.Core", "src\Scriptorium.Core\Scriptorium.Core.csproj", "{C9D08CBC-E8EB-4C6E-BD04-74DFD52FAD70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scriptorium.App", "src\Scriptorium.App\Scriptorium.App.csproj", "{D01AB298-46D6-4650-9B8D-2308CBEB1BCA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0A8EE4FD-C400-4210-AFAF-F582A9E9DB52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scriptorium.Data.Tests", "tests\Scriptorium.Data.Tests\Scriptorium.Data.Tests.csproj", "{92F9A7BC-B423-4613-BF11-1580A7BDC6E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scriptorium.Core.Tests", "tests\Scriptorium.Core.Tests\Scriptorium.Core.Tests.csproj", "{668243EE-B73E-480A-B2E4-760160037380}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4A219469-8712-4270-B412-C6C514CC5B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A219469-8712-4270-B412-C6C514CC5B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A219469-8712-4270-B412-C6C514CC5B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A219469-8712-4270-B412-C6C514CC5B4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8286879-3450-4FD7-83D7-35C5A5159878}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8286879-3450-4FD7-83D7-35C5A5159878}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8286879-3450-4FD7-83D7-35C5A5159878}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8286879-3450-4FD7-83D7-35C5A5159878}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9D08CBC-E8EB-4C6E-BD04-74DFD52FAD70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9D08CBC-E8EB-4C6E-BD04-74DFD52FAD70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9D08CBC-E8EB-4C6E-BD04-74DFD52FAD70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9D08CBC-E8EB-4C6E-BD04-74DFD52FAD70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D01AB298-46D6-4650-9B8D-2308CBEB1BCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D01AB298-46D6-4650-9B8D-2308CBEB1BCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D01AB298-46D6-4650-9B8D-2308CBEB1BCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D01AB298-46D6-4650-9B8D-2308CBEB1BCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F9A7BC-B423-4613-BF11-1580A7BDC6E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92F9A7BC-B423-4613-BF11-1580A7BDC6E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92F9A7BC-B423-4613-BF11-1580A7BDC6E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92F9A7BC-B423-4613-BF11-1580A7BDC6E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{668243EE-B73E-480A-B2E4-760160037380}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{668243EE-B73E-480A-B2E4-760160037380}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{668243EE-B73E-480A-B2E4-760160037380}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{668243EE-B73E-480A-B2E4-760160037380}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4A219469-8712-4270-B412-C6C514CC5B4A} = {498A575E-9020-4A5F-93A1-349B1FECF814}
+		{D8286879-3450-4FD7-83D7-35C5A5159878} = {498A575E-9020-4A5F-93A1-349B1FECF814}
+		{C9D08CBC-E8EB-4C6E-BD04-74DFD52FAD70} = {498A575E-9020-4A5F-93A1-349B1FECF814}
+		{D01AB298-46D6-4650-9B8D-2308CBEB1BCA} = {498A575E-9020-4A5F-93A1-349B1FECF814}
+		{92F9A7BC-B423-4613-BF11-1580A7BDC6E9} = {0A8EE4FD-C400-4210-AFAF-F582A9E9DB52}
+		{668243EE-B73E-480A-B2E4-760160037380} = {0A8EE4FD-C400-4210-AFAF-F582A9E9DB52}
+	EndGlobalSection
+EndGlobal
