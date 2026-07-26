@@ -3,11 +3,11 @@ using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Scriptorium.Core.DependencyInjection;
+using SciFiEditor.Core.DependencyInjection;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace Scriptorium.App;
+namespace SciFiEditor.App;
 
 public partial class App : Application
 {
@@ -19,14 +19,14 @@ public partial class App : Application
 
         var logDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "Scriptorium",
+            "SciFiEditor",
             "logs");
         Directory.CreateDirectory(logDirectory);
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.File(
-                Path.Combine(logDirectory, "scriptorium-.log"),
+                Path.Combine(logDirectory, "scifieditor-.log"),
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 30)
             .CreateLogger();
@@ -35,7 +35,7 @@ public partial class App : Application
             .ConfigureServices(services =>
             {
                 services.AddSingleton<ILogger>(Log.Logger);
-                services.AddScriptoriumCore();
+                services.AddSciFiEditorCore();
                 services.AddSingleton<MainWindow>();
             })
             .Build();
@@ -47,7 +47,7 @@ public partial class App : Application
         var mainWindow = _host.Services.GetRequiredService<MainWindow>();
         mainWindow.Show();
 
-        Log.Information("Scriptorium started");
+        Log.Information("SciFiEditor started");
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -57,7 +57,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        Log.Information("Scriptorium exiting");
+        Log.Information("SciFiEditor exiting");
         _host?.StopAsync().GetAwaiter().GetResult();
         _host?.Dispose();
         Log.CloseAndFlush();

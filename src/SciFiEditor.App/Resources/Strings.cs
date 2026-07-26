@@ -2,12 +2,12 @@ using System.Globalization;
 using System.Reflection;
 using System.Resources;
 
-namespace Scriptorium.App.Resources;
+namespace SciFiEditor.App.Resources;
 
 public static class Strings
 {
     private static readonly ResourceManager ResourceManager =
-        new("Scriptorium.App.Resources.Strings", Assembly.GetExecutingAssembly());
+        new("SciFiEditor.App.Resources.Strings", Assembly.GetExecutingAssembly());
 
     public static string MenuFile => Get("MenuFile");
     public static string MenuEdit => Get("MenuEdit");

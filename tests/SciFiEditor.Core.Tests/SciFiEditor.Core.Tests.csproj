@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Scriptorium.Data\Scriptorium.Data.csproj" />
+    <ProjectReference Include="..\..\src\SciFiEditor.Core\SciFiEditor.Core.csproj" />
   </ItemGroup>
 
 </Project>

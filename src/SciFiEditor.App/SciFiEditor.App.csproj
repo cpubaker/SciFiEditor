@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Scriptorium.Core\Scriptorium.Core.csproj" />
+    <ProjectReference Include="..\SciFiEditor.Core\SciFiEditor.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

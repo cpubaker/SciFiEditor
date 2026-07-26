@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace Scriptorium.App;
+namespace SciFiEditor.App;
 
 public partial class MainWindow : Window
 {

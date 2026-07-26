@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{806DE4F4-D34C-45F0-8647-6974F3E61117}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciFiEditor.Domain", "src\SciFiEditor.Domain\SciFiEditor.Domain.csproj", "{121458F4-A7DA-4FCE-9738-A4F4DC28240A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciFiEditor.Data", "src\SciFiEditor.Data\SciFiEditor.Data.csproj", "{AD864481-2792-4B60-BBBC-CC893383CC08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciFiEditor.Core", "src\SciFiEditor.Core\SciFiEditor.Core.csproj", "{187D89D1-49C3-441E-BF4E-D57B4943C68C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciFiEditor.App", "src\SciFiEditor.App\SciFiEditor.App.csproj", "{14C0AEFD-32C4-4697-8F89-81FD8D5D812D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{04483756-2275-44AA-B21F-869D3531B7E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciFiEditor.Data.Tests", "tests\SciFiEditor.Data.Tests\SciFiEditor.Data.Tests.csproj", "{B9FEDBEA-809A-47F6-A669-830E8D4D166D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciFiEditor.Core.Tests", "tests\SciFiEditor.Core.Tests\SciFiEditor.Core.Tests.csproj", "{5214B694-7CB9-4D21-83B4-774D3FF7F0E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{121458F4-A7DA-4FCE-9738-A4F4DC28240A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{121458F4-A7DA-4FCE-9738-A4F4DC28240A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{121458F4-A7DA-4FCE-9738-A4F4DC28240A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{121458F4-A7DA-4FCE-9738-A4F4DC28240A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD864481-2792-4B60-BBBC-CC893383CC08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD864481-2792-4B60-BBBC-CC893383CC08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD864481-2792-4B60-BBBC-CC893383CC08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD864481-2792-4B60-BBBC-CC893383CC08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{187D89D1-49C3-441E-BF4E-D57B4943C68C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{187D89D1-49C3-441E-BF4E-D57B4943C68C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{187D89D1-49C3-441E-BF4E-D57B4943C68C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{187D89D1-49C3-441E-BF4E-D57B4943C68C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14C0AEFD-32C4-4697-8F89-81FD8D5D812D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14C0AEFD-32C4-4697-8F89-81FD8D5D812D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14C0AEFD-32C4-4697-8F89-81FD8D5D812D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14C0AEFD-32C4-4697-8F89-81FD8D5D812D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9FEDBEA-809A-47F6-A669-830E8D4D166D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9FEDBEA-809A-47F6-A669-830E8D4D166D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9FEDBEA-809A-47F6-A669-830E8D4D166D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9FEDBEA-809A-47F6-A669-830E8D4D166D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5214B694-7CB9-4D21-83B4-774D3FF7F0E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5214B694-7CB9-4D21-83B4-774D3FF7F0E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5214B694-7CB9-4D21-83B4-774D3FF7F0E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5214B694-7CB9-4D21-83B4-774D3FF7F0E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{121458F4-A7DA-4FCE-9738-A4F4DC28240A} = {806DE4F4-D34C-45F0-8647-6974F3E61117}
+		{AD864481-2792-4B60-BBBC-CC893383CC08} = {806DE4F4-D34C-45F0-8647-6974F3E61117}
+		{187D89D1-49C3-441E-BF4E-D57B4943C68C} = {806DE4F4-D34C-45F0-8647-6974F3E61117}
+		{14C0AEFD-32C4-4697-8F89-81FD8D5D812D} = {806DE4F4-D34C-45F0-8647-6974F3E61117}
+		{B9FEDBEA-809A-47F6-A669-830E8D4D166D} = {04483756-2275-44AA-B21F-869D3531B7E8}
+		{5214B694-7CB9-4D21-83B4-774D3FF7F0E4} = {04483756-2275-44AA-B21F-869D3531B7E8}
+	EndGlobalSection
+EndGlobal
