@@ -41,6 +41,16 @@ public static class Strings
     public static string BinderNewFolderTitle => Get("BinderNewFolderTitle");
     public static string BinderNewChapterTitle => Get("BinderNewChapterTitle");
     public static string BinderNewSceneTitle => Get("BinderNewSceneTitle");
+    public static string InspectorLabel => Get("InspectorLabel");
+    public static string InspectorStatus => Get("InspectorStatus");
+    public static string InspectorTargetWordCount => Get("InspectorTargetWordCount");
+    public static string StatusNone => Get("StatusNone");
+    public static string StatusDraft => Get("StatusDraft");
+    public static string StatusRevised => Get("StatusRevised");
+    public static string StatusFinal => Get("StatusFinal");
+    public static string StatusBarSceneWords => Get("StatusBarSceneWords");
+    public static string StatusBarProjectWords => Get("StatusBarProjectWords");
+    public static string StatusBarSessionDelta => Get("StatusBarSessionDelta");
 
     private static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? name;

@@ -6,6 +6,17 @@ public sealed class ProjectDatabase : IDisposable
 {
     public const string DatabaseFileName = "project.db";
 
+    private static readonly (string Name, string Definition)[] MigratedColumns =
+    [
+        ("synopsis", "TEXT NOT NULL DEFAULT ''"),
+        ("notes", "TEXT NOT NULL DEFAULT ''"),
+        ("label", "TEXT NOT NULL DEFAULT ''"),
+        ("status", "TEXT NOT NULL DEFAULT 'None'"),
+        ("target_word_count", "INTEGER NULL"),
+        ("word_count", "INTEGER NOT NULL DEFAULT 0"),
+        ("char_count", "INTEGER NOT NULL DEFAULT 0")
+    ];
+
     public ProjectDatabase(string projectRootPath)
     {
         var dbPath = Path.Combine(projectRootPath, DatabaseFileName);
@@ -25,22 +36,59 @@ public sealed class ProjectDatabase : IDisposable
 
     private void EnsureSchema()
     {
-        using var cmd = Connection.CreateCommand();
-        cmd.CommandText = """
-            CREATE TABLE IF NOT EXISTS nodes (
-                id TEXT PRIMARY KEY,
-                parent_id TEXT NULL,
-                node_type TEXT NOT NULL,
-                title TEXT NOT NULL,
-                sort_order INTEGER NOT NULL,
-                is_trashed INTEGER NOT NULL DEFAULT 0,
-                original_parent_id TEXT NULL,
-                created_at_utc TEXT NOT NULL,
-                updated_at_utc TEXT NOT NULL
-            );
-            CREATE INDEX IF NOT EXISTS ix_nodes_parent_id ON nodes(parent_id);
-            """;
-        cmd.ExecuteNonQuery();
+        using (var cmd = Connection.CreateCommand())
+        {
+            cmd.CommandText = """
+                CREATE TABLE IF NOT EXISTS nodes (
+                    id TEXT PRIMARY KEY,
+                    parent_id TEXT NULL,
+                    node_type TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    sort_order INTEGER NOT NULL,
+                    is_trashed INTEGER NOT NULL DEFAULT 0,
+                    original_parent_id TEXT NULL,
+                    created_at_utc TEXT NOT NULL,
+                    updated_at_utc TEXT NOT NULL,
+                    synopsis TEXT NOT NULL DEFAULT '',
+                    notes TEXT NOT NULL DEFAULT '',
+                    label TEXT NOT NULL DEFAULT '',
+                    status TEXT NOT NULL DEFAULT 'None',
+                    target_word_count INTEGER NULL,
+                    word_count INTEGER NOT NULL DEFAULT 0,
+                    char_count INTEGER NOT NULL DEFAULT 0
+                );
+                CREATE INDEX IF NOT EXISTS ix_nodes_parent_id ON nodes(parent_id);
+                """;
+            cmd.ExecuteNonQuery();
+        }
+
+        MigrateMissingColumns();
+    }
+
+    private void MigrateMissingColumns()
+    {
+        var existingColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        using (var pragma = Connection.CreateCommand())
+        {
+            pragma.CommandText = "PRAGMA table_info(nodes);";
+            using var reader = pragma.ExecuteReader();
+            while (reader.Read())
+            {
+                existingColumns.Add(reader.GetString(reader.GetOrdinal("name")));
+            }
+        }
+
+        foreach (var (name, definition) in MigratedColumns)
+        {
+            if (existingColumns.Contains(name))
+            {
+                continue;
+            }
+
+            using var alter = Connection.CreateCommand();
+            alter.CommandText = $"ALTER TABLE nodes ADD COLUMN {name} {definition};";
+            alter.ExecuteNonQuery();
+        }
     }
 
     public void Dispose() => Connection.Dispose();

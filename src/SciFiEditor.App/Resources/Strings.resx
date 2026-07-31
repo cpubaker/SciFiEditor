@@ -154,4 +154,34 @@
   <data name="BinderNewSceneTitle" xml:space="preserve">
     <value>Нова сцена</value>
   </data>
+  <data name="InspectorLabel" xml:space="preserve">
+    <value>Мітка</value>
+  </data>
+  <data name="InspectorStatus" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="InspectorTargetWordCount" xml:space="preserve">
+    <value>Ціль (слів)</value>
+  </data>
+  <data name="StatusNone" xml:space="preserve">
+    <value>Немає</value>
+  </data>
+  <data name="StatusDraft" xml:space="preserve">
+    <value>Чернетка</value>
+  </data>
+  <data name="StatusRevised" xml:space="preserve">
+    <value>Перероблено</value>
+  </data>
+  <data name="StatusFinal" xml:space="preserve">
+    <value>Завершено</value>
+  </data>
+  <data name="StatusBarSceneWords" xml:space="preserve">
+    <value>Сцена: {0} слів / {1} символів</value>
+  </data>
+  <data name="StatusBarProjectWords" xml:space="preserve">
+    <value>Проєкт: {0} слів</value>
+  </data>
+  <data name="StatusBarSessionDelta" xml:space="preserve">
+    <value>Сесія: {0:+#;-#;0} слів</value>
+  </data>
 </root>

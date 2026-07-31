@@ -54,6 +54,21 @@ public sealed class NodeService
         Project.Nodes.UpdateTitle(id, title, DateTime.UtcNow);
     }
 
+    public void UpdateInspector(Guid id, string synopsis, string notes, string label, NodeStatus status, int? targetWordCount)
+    {
+        if (id == WellKnownNodeIds.Trash)
+        {
+            throw new InvalidOperationException("The Trash node cannot be edited.");
+        }
+
+        Project.Nodes.UpdateInspector(id, synopsis, notes, label, status, targetWordCount, DateTime.UtcNow);
+    }
+
+    public void UpdateWordCounts(Guid id, int wordCount, int charCount) =>
+        Project.Nodes.UpdateWordCounts(id, wordCount, charCount);
+
+    public int GetProjectWordCount() => Project.Nodes.GetProjectWordCount();
+
     public ManuscriptNode Duplicate(Guid id)
     {
         if (id == WellKnownNodeIds.Trash)

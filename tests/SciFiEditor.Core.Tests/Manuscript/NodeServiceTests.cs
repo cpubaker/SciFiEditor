@@ -154,6 +154,52 @@ public class NodeServiceTests : IDisposable
 
         act.Should().Throw<InvalidOperationException>();
     }
+
+    [Fact]
+    public void UpdateInspector_PersistsFields()
+    {
+        var node = _nodeService.AddNode(NodeType.Scene, "Scene", null);
+
+        _nodeService.UpdateInspector(node.Id, "Synopsis text", "Notes text", "POV: Bob", NodeStatus.Final, 2000);
+
+        var updated = _nodeService.GetAll().Single(n => n.Id == node.Id);
+        updated.Synopsis.Should().Be("Synopsis text");
+        updated.Notes.Should().Be("Notes text");
+        updated.Label.Should().Be("POV: Bob");
+        updated.Status.Should().Be(NodeStatus.Final);
+        updated.TargetWordCount.Should().Be(2000);
+    }
+
+    [Fact]
+    public void UpdateInspector_TrashNode_Throws()
+    {
+        var act = () => _nodeService.UpdateInspector(WellKnownNodeIds.Trash, "", "", "", NodeStatus.None, null);
+
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void UpdateWordCounts_PersistsThroughNodeService()
+    {
+        var node = _nodeService.AddNode(NodeType.Scene, "Scene", null);
+
+        _nodeService.UpdateWordCounts(node.Id, 42, 210);
+
+        var updated = _nodeService.GetAll().Single(n => n.Id == node.Id);
+        updated.WordCount.Should().Be(42);
+        updated.CharCount.Should().Be(210);
+    }
+
+    [Fact]
+    public void GetProjectWordCount_ReturnsSumAcrossScenes()
+    {
+        var sceneA = _nodeService.AddNode(NodeType.Scene, "A", null);
+        var sceneB = _nodeService.AddNode(NodeType.Scene, "B", null);
+        _nodeService.UpdateWordCounts(sceneA.Id, 100, 500);
+        _nodeService.UpdateWordCounts(sceneB.Id, 250, 1200);
+
+        _nodeService.GetProjectWordCount().Should().Be(350);
+    }
 }
 
 public class NodeServiceNoProjectTests

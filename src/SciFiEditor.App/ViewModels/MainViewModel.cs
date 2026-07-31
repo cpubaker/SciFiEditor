@@ -20,8 +20,10 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     private readonly RecentProjectsService _recentProjectsService;
     private readonly ManuscriptFileService _fileService;
     private readonly SceneAutosaveCoordinator _autosaveCoordinator;
+    private readonly WordCountCoordinator _wordCountCoordinator;
     private readonly ILogger _logger;
     private bool _isLoadingContent;
+    private int _sessionBaselineWordCount;
 
     public MainViewModel(
         ProjectService projectService,
@@ -29,6 +31,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         RecentProjectsService recentProjectsService,
         ManuscriptFileService fileService,
         SceneAutosaveCoordinator autosaveCoordinator,
+        WordCountCoordinator wordCountCoordinator,
         ILogger logger)
     {
         _projectService = projectService;
@@ -36,13 +39,24 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         _recentProjectsService = recentProjectsService;
         _fileService = fileService;
         _autosaveCoordinator = autosaveCoordinator;
+        _wordCountCoordinator = wordCountCoordinator;
         _logger = logger;
+
+        _wordCountCoordinator.Counted += OnWordCountPersisted;
 
         RefreshRecentProjects();
     }
 
     public ObservableCollection<BinderNodeViewModel> RootNodes { get; } = new();
     public ObservableCollection<RecentProjectEntry> RecentProjects { get; } = new();
+
+    public IReadOnlyList<NodeStatusOption> StatusOptions { get; } =
+    [
+        new(NodeStatus.None, Strings.StatusNone),
+        new(NodeStatus.Draft, Strings.StatusDraft),
+        new(NodeStatus.Revised, Strings.StatusRevised),
+        new(NodeStatus.Final, Strings.StatusFinal)
+    ];
 
     [ObservableProperty]
     private BinderNodeViewModel? _selectedNode;
@@ -59,6 +73,18 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     [ObservableProperty]
     private string _editorContent = string.Empty;
 
+    [ObservableProperty]
+    private int _sceneWordCount;
+
+    [ObservableProperty]
+    private int _sceneCharCount;
+
+    [ObservableProperty]
+    private int _projectWordCount;
+
+    [ObservableProperty]
+    private int _sessionWordDelta;
+
     partial void OnEditorContentChanged(string value)
     {
         if (_isLoadingContent || SelectedNode is not { NodeType: NodeType.Scene } scene)
@@ -67,6 +93,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         }
 
         _autosaveCoordinator.NotifyChanged(scene.Id, value);
+        _wordCountCoordinator.NotifyChanged(scene.Id, value);
     }
 
     public async Task OnBinderSelectionChangedAsync(BinderNodeViewModel? newSelection)
@@ -74,10 +101,13 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         if (SelectedNode is { NodeType: NodeType.Scene })
         {
             await _autosaveCoordinator.FlushAsync();
+            await _wordCountCoordinator.FlushAsync();
         }
 
         SelectedNode = newSelection;
         IsSceneSelected = newSelection?.NodeType == NodeType.Scene;
+        SceneWordCount = newSelection?.WordCount ?? 0;
+        SceneCharCount = newSelection?.CharCount ?? 0;
 
         _isLoadingContent = true;
         EditorContent = IsSceneSelected && _projectService.Current is not null
@@ -86,7 +116,42 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         _isLoadingContent = false;
     }
 
-    public Task FlushAutosaveAsync() => _autosaveCoordinator.FlushAsync();
+    public async Task FlushAutosaveAsync()
+    {
+        await _autosaveCoordinator.FlushAsync();
+        await _wordCountCoordinator.FlushAsync();
+    }
+
+    private void OnWordCountPersisted(Guid nodeId, int words, int chars)
+    {
+        Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            if (SelectedNode?.Id == nodeId)
+            {
+                SelectedNode.UpdateWordCount(words, chars);
+                SceneWordCount = words;
+                SceneCharCount = chars;
+            }
+
+            RefreshProjectWordCount();
+        });
+    }
+
+    private void RefreshProjectWordCount(bool resetSessionBaseline = false)
+    {
+        if (_projectService.Current is null)
+        {
+            return;
+        }
+
+        ProjectWordCount = _nodeService.GetProjectWordCount();
+        if (resetSessionBaseline)
+        {
+            _sessionBaselineWordCount = ProjectWordCount;
+        }
+
+        SessionWordDelta = ProjectWordCount - _sessionBaselineWordCount;
+    }
 
     [RelayCommand]
     private async Task SaveAsync() => await FlushAutosaveAsync();
@@ -103,7 +168,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         try
         {
             _projectService.CreateProject(dialog.ProjectLocation, dialog.ProjectName);
-            LoadTree();
+            LoadTree(resetSessionBaseline: true);
         }
         catch (Exception ex)
         {
@@ -190,7 +255,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         try
         {
             _projectService.OpenProject(path);
-            LoadTree();
+            LoadTree(resetSessionBaseline: true);
         }
         catch (Exception ex)
         {
@@ -211,7 +276,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             };
 
             var created = _nodeService.AddNode(nodeType, defaultTitle, parent?.Id);
-            var vm = new BinderNodeViewModel(created, OnRenameCommitted);
+            var vm = new BinderNodeViewModel(created, OnRenameCommitted, OnInspectorCommitted);
             var collection = parent?.Children ?? RootNodes;
             collection.Add(vm);
             vm.BeginRename();
@@ -236,7 +301,20 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         }
     }
 
-    private void LoadTree()
+    private void OnInspectorCommitted(BinderNodeViewModel node)
+    {
+        try
+        {
+            _nodeService.UpdateInspector(node.Id, node.Synopsis, node.Notes, node.Label, node.Status, node.TargetWordCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to update inspector fields for node {Id}", node.Id);
+            ShowError(ex.Message);
+        }
+    }
+
+    private void LoadTree(bool resetSessionBaseline = false)
     {
         var expandedIds = CollectExpandedIds(RootNodes);
         var selectedId = SelectedNode?.Id;
@@ -247,7 +325,10 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
         BinderNodeViewModel Build(ManuscriptNode node)
         {
-            var vm = new BinderNodeViewModel(node, OnRenameCommitted) { IsExpanded = expandedIds.Contains(node.Id) };
+            var vm = new BinderNodeViewModel(node, OnRenameCommitted, OnInspectorCommitted)
+            {
+                IsExpanded = expandedIds.Contains(node.Id)
+            };
             foreach (var child in childrenByParent[node.Id].OrderBy(n => n.SortOrder))
             {
                 vm.Children.Add(Build(child));
@@ -263,6 +344,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
         IsProjectOpen = true;
         RefreshRecentProjects();
+        RefreshProjectWordCount(resetSessionBaseline);
 
         if (selectedId is Guid id)
         {
