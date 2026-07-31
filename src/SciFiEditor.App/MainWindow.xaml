@@ -5,12 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SciFiEditor.App"
         xmlns:res="clr-namespace:SciFiEditor.App.Resources"
+        xmlns:conv="clr-namespace:SciFiEditor.App.Converters"
+        xmlns:behaviors="clr-namespace:SciFiEditor.App.Behaviors"
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
         Title="SciFiEditor" Height="720" Width="1280"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="{x:Static res:Strings.MenuFile}" />
+            <MenuItem Header="{x:Static res:Strings.MenuFile}">
+                <MenuItem Header="{x:Static res:Strings.MenuNewProject}" Command="{Binding NewProjectCommand}" />
+                <MenuItem Header="{x:Static res:Strings.MenuOpenProject}" Command="{Binding OpenProjectCommand}" />
+                <MenuItem Header="{x:Static res:Strings.MenuRecentProjects}" ItemsSource="{Binding RecentProjects}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Header" Value="{Binding DisplayName}" />
+                            <Setter Property="Command" Value="{Binding DataContext.OpenRecentProjectCommand, RelativeSource={RelativeSource AncestorType=Menu}}" />
+                            <Setter Property="CommandParameter" Value="{Binding}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static res:Strings.MenuSave}" Command="{Binding SaveCommand}" />
+            </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuEdit}" />
             <MenuItem Header="{x:Static res:Strings.MenuView}" />
             <MenuItem Header="{x:Static res:Strings.MenuProject}" />
@@ -33,16 +55,74 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="0,0,1,0">
-                <!-- Binder: manuscript tree, populated in M1 -->
-                <Grid />
+                <TreeView x:Name="BinderTreeView" ItemsSource="{Binding RootNodes}"
+                          VirtualizingPanel.IsVirtualizing="True"
+                          VirtualizingPanel.VirtualizationMode="Recycling"
+                          SelectedItemChanged="BinderTreeView_SelectedItemChanged"
+                          dd:DragDrop.IsDragSource="True"
+                          dd:DragDrop.IsDropTarget="True"
+                          dd:DragDrop.UseDefaultDragAdorner="True">
+                    <TreeView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{x:Static res:Strings.BinderAddFolder}" Command="{Binding AddFolderCommand}" />
+                            <MenuItem Header="{x:Static res:Strings.BinderAddChapter}" Command="{Binding AddChapterCommand}" />
+                            <MenuItem Header="{x:Static res:Strings.BinderAddScene}" Command="{Binding AddSceneCommand}" />
+                        </ContextMenu>
+                    </TreeView.ContextMenu>
+                    <TreeView.Resources>
+                        <ContextMenu x:Key="BinderNodeContextMenu">
+                            <MenuItem Header="{x:Static res:Strings.BinderAddFolder}"
+                                      Command="{Binding DataContext.AddFolderCommand, ElementName=BinderTreeView}"
+                                      CommandParameter="{Binding}" />
+                            <MenuItem Header="{x:Static res:Strings.BinderAddChapter}"
+                                      Command="{Binding DataContext.AddChapterCommand, ElementName=BinderTreeView}"
+                                      CommandParameter="{Binding}" />
+                            <MenuItem Header="{x:Static res:Strings.BinderAddScene}"
+                                      Command="{Binding DataContext.AddSceneCommand, ElementName=BinderTreeView}"
+                                      CommandParameter="{Binding}" />
+                            <Separator />
+                            <MenuItem Header="{x:Static res:Strings.BinderRename}"
+                                      Command="{Binding DataContext.RenameCommand, ElementName=BinderTreeView}"
+                                      CommandParameter="{Binding}" />
+                            <MenuItem Header="{x:Static res:Strings.BinderDuplicate}"
+                                      Command="{Binding DataContext.DuplicateCommand, ElementName=BinderTreeView}"
+                                      CommandParameter="{Binding}" />
+                            <MenuItem Header="{x:Static res:Strings.BinderMoveToTrash}"
+                                      Command="{Binding DataContext.MoveToTrashCommand, ElementName=BinderTreeView}"
+                                      CommandParameter="{Binding}" />
+                        </ContextMenu>
+                    </TreeView.Resources>
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="ContextMenu" Value="{StaticResource BinderNodeContextMenu}" />
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <Grid>
+                                <TextBlock Text="{Binding Title}"
+                                           Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                                <TextBox Text="{Binding EditTitle, UpdateSourceTrigger=PropertyChanged}"
+                                         Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
+                                         IsVisibleChanged="RenameTextBox_IsVisibleChanged"
+                                         KeyDown="RenameTextBox_KeyDown"
+                                         LostFocus="RenameTextBox_LostFocus" />
+                            </Grid>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
             </Border>
 
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" />
 
             <TabControl Grid.Column="2">
                 <TabItem Header="{x:Static res:Strings.TabText}">
-                    <!-- AvalonEdit scene editor, wired up in M1 -->
-                    <Grid />
+                    <avalonEdit:TextEditor behaviors:AvalonEditBehavior.BindableText="{Binding EditorContent, Mode=TwoWay}"
+                                            IsEnabled="{Binding IsSceneSelected}"
+                                            FontFamily="Consolas" FontSize="14"
+                                            WordWrap="True"
+                                            ShowLineNumbers="False" />
                 </TabItem>
                 <TabItem Header="{x:Static res:Strings.TabBoard}">
                     <!-- Corkboard, wired up in M5 -->
