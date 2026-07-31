@@ -91,4 +91,67 @@
   <data name="StatusReady" xml:space="preserve">
     <value>Готово</value>
   </data>
+  <data name="MenuNewProject" xml:space="preserve">
+    <value>Новий проєкт</value>
+  </data>
+  <data name="MenuOpenProject" xml:space="preserve">
+    <value>Відкрити проєкт</value>
+  </data>
+  <data name="MenuRecentProjects" xml:space="preserve">
+    <value>Останні проєкти</value>
+  </data>
+  <data name="MenuSave" xml:space="preserve">
+    <value>Зберегти</value>
+  </data>
+  <data name="BinderAddFolder" xml:space="preserve">
+    <value>Додати теку</value>
+  </data>
+  <data name="BinderAddChapter" xml:space="preserve">
+    <value>Додати розділ</value>
+  </data>
+  <data name="BinderAddScene" xml:space="preserve">
+    <value>Додати сцену</value>
+  </data>
+  <data name="BinderRename" xml:space="preserve">
+    <value>Перейменувати</value>
+  </data>
+  <data name="BinderDuplicate" xml:space="preserve">
+    <value>Дублювати</value>
+  </data>
+  <data name="BinderMoveToTrash" xml:space="preserve">
+    <value>Перемістити в кошик</value>
+  </data>
+  <data name="BinderTrashTitle" xml:space="preserve">
+    <value>Кошик</value>
+  </data>
+  <data name="DialogNewProjectTitle" xml:space="preserve">
+    <value>Новий проєкт</value>
+  </data>
+  <data name="DialogNewProjectName" xml:space="preserve">
+    <value>Назва проєкту</value>
+  </data>
+  <data name="DialogNewProjectLocation" xml:space="preserve">
+    <value>Розташування</value>
+  </data>
+  <data name="DialogBrowse" xml:space="preserve">
+    <value>Огляд...</value>
+  </data>
+  <data name="DialogOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="DialogCancel" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Помилка</value>
+  </data>
+  <data name="BinderNewFolderTitle" xml:space="preserve">
+    <value>Нова тека</value>
+  </data>
+  <data name="BinderNewChapterTitle" xml:space="preserve">
+    <value>Новий розділ</value>
+  </data>
+  <data name="BinderNewSceneTitle" xml:space="preserve">
+    <value>Нова сцена</value>
+  </data>
 </root>
