@@ -69,4 +69,20 @@ public partial class MainWindow : Window
             node.CommitRename();
         }
     }
+
+    private void InspectorField_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: BinderNodeViewModel node })
+        {
+            node.CommitInspector();
+        }
+    }
+
+    private void InspectorField_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: BinderNodeViewModel node })
+        {
+            node.CommitInspector();
+        }
+    }
 }

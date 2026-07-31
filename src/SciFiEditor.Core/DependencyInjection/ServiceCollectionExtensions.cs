@@ -22,6 +22,17 @@ public static class ServiceCollectionExtensions
                 (nodeId, content) => fileService.WriteSceneAsync(projectService.Current!.RootPath, nodeId, content),
                 TimeSpan.FromSeconds(2));
         });
+        services.AddSingleton(sp =>
+        {
+            var nodeService = sp.GetRequiredService<NodeService>();
+            return new WordCountCoordinator(
+                (nodeId, words, chars) =>
+                {
+                    nodeService.UpdateWordCounts(nodeId, words, chars);
+                    return Task.CompletedTask;
+                },
+                TimeSpan.FromMilliseconds(400));
+        });
 
         return services;
     }

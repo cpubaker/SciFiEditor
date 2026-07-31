@@ -117,4 +117,66 @@ public class NodeRepositoryTests : IDisposable
 
         _repository.GetNextSortOrder(null).Should().Be(4000);
     }
+
+    [Fact]
+    public void UpdateInspector_PersistsAllFields()
+    {
+        var node = CreateNode(title: "Scene One");
+        _repository.Insert(node);
+
+        _repository.UpdateInspector(node.Id, "A synopsis.", "Some notes.", "POV: Alice", NodeStatus.Revised, 1500, DateTime.UtcNow);
+
+        var updated = _repository.GetById(node.Id)!;
+        updated.Synopsis.Should().Be("A synopsis.");
+        updated.Notes.Should().Be("Some notes.");
+        updated.Label.Should().Be("POV: Alice");
+        updated.Status.Should().Be(NodeStatus.Revised);
+        updated.TargetWordCount.Should().Be(1500);
+    }
+
+    [Fact]
+    public void UpdateInspector_AllowsClearingTargetWordCount()
+    {
+        var node = CreateNode();
+        _repository.Insert(node);
+        _repository.UpdateInspector(node.Id, "", "", "", NodeStatus.Draft, 500, DateTime.UtcNow);
+
+        _repository.UpdateInspector(node.Id, "", "", "", NodeStatus.Draft, null, DateTime.UtcNow);
+
+        _repository.GetById(node.Id)!.TargetWordCount.Should().BeNull();
+    }
+
+    [Fact]
+    public void UpdateWordCounts_PersistsCounts()
+    {
+        var node = CreateNode();
+        _repository.Insert(node);
+
+        _repository.UpdateWordCounts(node.Id, 250, 1300);
+
+        var updated = _repository.GetById(node.Id)!;
+        updated.WordCount.Should().Be(250);
+        updated.CharCount.Should().Be(1300);
+    }
+
+    [Fact]
+    public void GetProjectWordCount_SumsOnlyNonTrashedScenes()
+    {
+        var sceneA = CreateNode(NodeType.Scene, title: "Scene A");
+        var sceneB = CreateNode(NodeType.Scene, sortOrder: 2000, title: "Scene B");
+        var trashedScene = CreateNode(NodeType.Scene, sortOrder: 3000, title: "Trashed Scene");
+        var folder = CreateNode(NodeType.Folder, sortOrder: 4000, title: "Folder");
+        _repository.Insert(sceneA);
+        _repository.Insert(sceneB);
+        _repository.Insert(trashedScene);
+        _repository.Insert(folder);
+
+        _repository.UpdateWordCounts(sceneA.Id, 100, 500);
+        _repository.UpdateWordCounts(sceneB.Id, 200, 900);
+        _repository.UpdateWordCounts(trashedScene.Id, 999, 9999);
+        _repository.MoveToTrash(trashedScene.Id, DateTime.UtcNow);
+        _repository.UpdateWordCounts(folder.Id, 50, 200);
+
+        _repository.GetProjectWordCount().Should().Be(300);
+    }
 }
