@@ -58,6 +58,18 @@ public sealed class ProjectDatabase : IDisposable
                     char_count INTEGER NOT NULL DEFAULT 0
                 );
                 CREATE INDEX IF NOT EXISTS ix_nodes_parent_id ON nodes(parent_id);
+
+                CREATE TABLE IF NOT EXISTS daily_stats (
+                    date TEXT PRIMARY KEY,
+                    word_count_total INTEGER NOT NULL,
+                    words_written INTEGER NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS project_settings (
+                    id INTEGER PRIMARY KEY CHECK (id = 1),
+                    daily_goal INTEGER NULL,
+                    session_goal INTEGER NULL
+                );
                 """;
             cmd.ExecuteNonQuery();
         }

@@ -184,4 +184,28 @@
   <data name="StatusBarSessionDelta" xml:space="preserve">
     <value>Сесія: {0:+#;-#;0} слів</value>
   </data>
+  <data name="MenuStatistics" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
+  <data name="StatsWindowTitle" xml:space="preserve">
+    <value>Статистика написання</value>
+  </data>
+  <data name="StatsHeatmapLabel" xml:space="preserve">
+    <value>Активність</value>
+  </data>
+  <data name="StatsChartLabel" xml:space="preserve">
+    <value>Останні 30 днів</value>
+  </data>
+  <data name="StatsStreakLabel" xml:space="preserve">
+    <value>Серія: {0} дн.</value>
+  </data>
+  <data name="StatsDailyGoalLabel" xml:space="preserve">
+    <value>Денна ціль (слів)</value>
+  </data>
+  <data name="StatsSessionGoalLabel" xml:space="preserve">
+    <value>Ціль сесії (слів)</value>
+  </data>
+  <data name="StatsSaveGoals" xml:space="preserve">
+    <value>Зберегти цілі</value>
+  </data>
 </root>

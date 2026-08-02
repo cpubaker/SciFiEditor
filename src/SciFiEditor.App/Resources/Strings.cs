@@ -51,6 +51,14 @@ public static class Strings
     public static string StatusBarSceneWords => Get("StatusBarSceneWords");
     public static string StatusBarProjectWords => Get("StatusBarProjectWords");
     public static string StatusBarSessionDelta => Get("StatusBarSessionDelta");
+    public static string MenuStatistics => Get("MenuStatistics");
+    public static string StatsWindowTitle => Get("StatsWindowTitle");
+    public static string StatsHeatmapLabel => Get("StatsHeatmapLabel");
+    public static string StatsChartLabel => Get("StatsChartLabel");
+    public static string StatsStreakLabel => Get("StatsStreakLabel");
+    public static string StatsDailyGoalLabel => Get("StatsDailyGoalLabel");
+    public static string StatsSessionGoalLabel => Get("StatsSessionGoalLabel");
+    public static string StatsSaveGoals => Get("StatsSaveGoals");
 
     private static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? name;

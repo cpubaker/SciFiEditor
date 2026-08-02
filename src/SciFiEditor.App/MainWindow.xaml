@@ -36,7 +36,10 @@
             </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuEdit}" />
             <MenuItem Header="{x:Static res:Strings.MenuView}" />
-            <MenuItem Header="{x:Static res:Strings.MenuProject}" />
+            <MenuItem Header="{x:Static res:Strings.MenuProject}">
+                <MenuItem Header="{x:Static res:Strings.MenuStatistics}" Command="{Binding OpenStatsCommand}"
+                          IsEnabled="{Binding IsProjectOpen}" />
+            </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuHelp}" />
         </Menu>
 

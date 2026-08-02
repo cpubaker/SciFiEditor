@@ -9,11 +9,13 @@ public sealed class OpenProject : IDisposable
         RootPath = rootPath;
         Database = new ProjectDatabase(rootPath);
         Nodes = new NodeRepository(Database);
+        Stats = new StatsRepository(Database);
     }
 
     public string RootPath { get; }
     public ProjectDatabase Database { get; }
     public NodeRepository Nodes { get; }
+    public StatsRepository Stats { get; }
 
     public void Dispose() => Database.Dispose();
 }
