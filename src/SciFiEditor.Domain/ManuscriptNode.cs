@@ -19,4 +19,5 @@ public class ManuscriptNode
     public int? TargetWordCount { get; set; }
     public int WordCount { get; set; }
     public int CharCount { get; set; }
+    public bool IncludeInCompile { get; set; } = true;
 }

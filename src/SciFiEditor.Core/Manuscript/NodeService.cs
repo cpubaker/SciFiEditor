@@ -67,6 +67,16 @@ public sealed class NodeService
     public void UpdateWordCounts(Guid id, int wordCount, int charCount) =>
         Project.Nodes.UpdateWordCounts(id, wordCount, charCount);
 
+    public void SetIncludeInCompile(Guid id, bool include)
+    {
+        if (id == WellKnownNodeIds.Trash)
+        {
+            throw new InvalidOperationException("The Trash node cannot be included in compile.");
+        }
+
+        Project.Nodes.UpdateIncludeInCompile(id, include, DateTime.UtcNow);
+    }
+
     public int GetProjectWordCount() => Project.Nodes.GetProjectWordCount();
 
     public ManuscriptNode Duplicate(Guid id)

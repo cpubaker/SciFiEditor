@@ -9,6 +9,7 @@
         xmlns:conv="clr-namespace:SciFiEditor.App.Converters"
         xmlns:behaviors="clr-namespace:SciFiEditor.App.Behaviors"
         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
         Title="SciFiEditor" Height="720" Width="1280"
@@ -38,6 +39,8 @@
             <MenuItem Header="{x:Static res:Strings.MenuView}" />
             <MenuItem Header="{x:Static res:Strings.MenuProject}">
                 <MenuItem Header="{x:Static res:Strings.MenuStatistics}" Command="{Binding OpenStatsCommand}"
+                          IsEnabled="{Binding IsProjectOpen}" />
+                <MenuItem Header="{x:Static res:Strings.MenuCompile}" Command="{Binding OpenCompileCommand}"
                           IsEnabled="{Binding IsProjectOpen}" />
             </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuHelp}" />
@@ -104,6 +107,11 @@
                                       Command="{Binding DataContext.AddSceneCommand, ElementName=BinderTreeView}"
                                       CommandParameter="{Binding}" />
                             <Separator />
+                            <MenuItem Header="{x:Static res:Strings.BinderIncludeInCompile}" IsCheckable="True"
+                                      IsChecked="{Binding IncludeInCompile, Mode=OneWay}"
+                                      Command="{Binding DataContext.ToggleIncludeInCompileCommand, ElementName=BinderTreeView}"
+                                      CommandParameter="{Binding}" />
+                            <Separator />
                             <MenuItem Header="{x:Static res:Strings.BinderRename}"
                                       Command="{Binding DataContext.RenameCommand, ElementName=BinderTreeView}"
                                       CommandParameter="{Binding}" />
@@ -152,8 +160,7 @@
                     <Grid />
                 </TabItem>
                 <TabItem Header="{x:Static res:Strings.TabPreview}">
-                    <!-- WebView2 Markdown preview, wired up in M4 -->
-                    <Grid />
+                    <wv2:WebView2 behaviors:WebView2Behavior.BindableHtml="{Binding PreviewHtml}" />
                 </TabItem>
             </TabControl>
 

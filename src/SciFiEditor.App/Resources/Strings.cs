@@ -59,6 +59,12 @@ public static class Strings
     public static string StatsDailyGoalLabel => Get("StatsDailyGoalLabel");
     public static string StatsSessionGoalLabel => Get("StatsSessionGoalLabel");
     public static string StatsSaveGoals => Get("StatsSaveGoals");
+    public static string MenuCompile => Get("MenuCompile");
+    public static string BinderIncludeInCompile => Get("BinderIncludeInCompile");
+    public static string CompileWindowTitle => Get("CompileWindowTitle");
+    public static string CompileFormatLabel => Get("CompileFormatLabel");
+    public static string CompileExportButton => Get("CompileExportButton");
+    public static string CompileSuccess => Get("CompileSuccess");
 
     private static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? name;

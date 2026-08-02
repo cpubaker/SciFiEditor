@@ -14,7 +14,8 @@ public sealed class ProjectDatabase : IDisposable
         ("status", "TEXT NOT NULL DEFAULT 'None'"),
         ("target_word_count", "INTEGER NULL"),
         ("word_count", "INTEGER NOT NULL DEFAULT 0"),
-        ("char_count", "INTEGER NOT NULL DEFAULT 0")
+        ("char_count", "INTEGER NOT NULL DEFAULT 0"),
+        ("include_in_compile", "INTEGER NOT NULL DEFAULT 1")
     ];
 
     public ProjectDatabase(string projectRootPath)
@@ -55,7 +56,8 @@ public sealed class ProjectDatabase : IDisposable
                     status TEXT NOT NULL DEFAULT 'None',
                     target_word_count INTEGER NULL,
                     word_count INTEGER NOT NULL DEFAULT 0,
-                    char_count INTEGER NOT NULL DEFAULT 0
+                    char_count INTEGER NOT NULL DEFAULT 0,
+                    include_in_compile INTEGER NOT NULL DEFAULT 1
                 );
                 CREATE INDEX IF NOT EXISTS ix_nodes_parent_id ON nodes(parent_id);
 

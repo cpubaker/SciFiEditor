@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SciFiEditor.Core.Compile;
 using SciFiEditor.Core.Manuscript;
 using SciFiEditor.Core.Projects;
 using SciFiEditor.Core.Stats;
@@ -16,6 +17,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ManuscriptFileService>();
         services.AddSingleton<NodeService>();
         services.AddSingleton<WritingStatsService>();
+        services.AddSingleton<CompileService>();
+        services.AddSingleton<ExportService>();
         services.AddSingleton(sp =>
         {
             var projectService = sp.GetRequiredService<ProjectService>();

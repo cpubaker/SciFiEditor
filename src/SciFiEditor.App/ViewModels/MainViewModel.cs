@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
 using SciFiEditor.App.Resources;
 using SciFiEditor.App.Views;
+using SciFiEditor.Core.Compile;
 using SciFiEditor.Core.Manuscript;
 using SciFiEditor.Core.Projects;
 using SciFiEditor.Core.Stats;
@@ -23,7 +25,10 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     private readonly SceneAutosaveCoordinator _autosaveCoordinator;
     private readonly WordCountCoordinator _wordCountCoordinator;
     private readonly WritingStatsService _statsService;
+    private readonly CompileService _compileService;
+    private readonly ExportService _exportService;
     private readonly ILogger _logger;
+    private readonly DispatcherTimer _previewTimer;
     private bool _isLoadingContent;
     private int _sessionBaselineWordCount;
 
@@ -35,6 +40,8 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         SceneAutosaveCoordinator autosaveCoordinator,
         WordCountCoordinator wordCountCoordinator,
         WritingStatsService statsService,
+        CompileService compileService,
+        ExportService exportService,
         ILogger logger)
     {
         _projectService = projectService;
@@ -44,9 +51,18 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         _autosaveCoordinator = autosaveCoordinator;
         _wordCountCoordinator = wordCountCoordinator;
         _statsService = statsService;
+        _compileService = compileService;
+        _exportService = exportService;
         _logger = logger;
 
         _wordCountCoordinator.Counted += OnWordCountPersisted;
+
+        _previewTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
+        _previewTimer.Tick += (_, _) =>
+        {
+            _previewTimer.Stop();
+            PreviewHtml = MarkdownPreviewService.ToHtml(EditorContent);
+        };
 
         RefreshRecentProjects();
     }
@@ -89,6 +105,9 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     [ObservableProperty]
     private int _sessionWordDelta;
 
+    [ObservableProperty]
+    private string _previewHtml = string.Empty;
+
     partial void OnEditorContentChanged(string value)
     {
         if (_isLoadingContent || SelectedNode is not { NodeType: NodeType.Scene } scene)
@@ -98,6 +117,9 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
         _autosaveCoordinator.NotifyChanged(scene.Id, value);
         _wordCountCoordinator.NotifyChanged(scene.Id, value);
+
+        _previewTimer.Stop();
+        _previewTimer.Start();
     }
 
     public async Task OnBinderSelectionChangedAsync(BinderNodeViewModel? newSelection)
@@ -118,6 +140,9 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             ? await _fileService.ReadSceneAsync(_projectService.Current.RootPath, newSelection!.Id)
             : string.Empty;
         _isLoadingContent = false;
+
+        _previewTimer.Stop();
+        PreviewHtml = MarkdownPreviewService.ToHtml(EditorContent);
     }
 
     public async Task FlushAutosaveAsync()
@@ -172,6 +197,36 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         var viewModel = new StatsViewModel(_statsService);
         var window = new StatsWindow(viewModel) { Owner = Application.Current.MainWindow };
         window.ShowDialog();
+    }
+
+    [RelayCommand]
+    private void OpenCompile()
+    {
+        var viewModel = new CompileViewModel(_compileService, _exportService);
+        var window = new CompileWindow(viewModel) { Owner = Application.Current.MainWindow };
+        window.ShowDialog();
+    }
+
+    [RelayCommand]
+    private void ToggleIncludeInCompile(BinderNodeViewModel? node)
+    {
+        if (node is null || node.IsTrashNode)
+        {
+            return;
+        }
+
+        try
+        {
+            var newValue = !node.IncludeInCompile;
+            _nodeService.SetIncludeInCompile(node.Id, newValue);
+            node.IncludeInCompile = newValue;
+            node.Node.IncludeInCompile = newValue;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to toggle include-in-compile for node {Id}", node.Id);
+            ShowError(ex.Message);
+        }
     }
 
     [RelayCommand]
