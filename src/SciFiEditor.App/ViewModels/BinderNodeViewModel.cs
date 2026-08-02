@@ -27,6 +27,7 @@ public sealed partial class BinderNodeViewModel : ObservableObject
         _targetWordCount = node.TargetWordCount;
         _wordCount = node.WordCount;
         _charCount = node.CharCount;
+        _includeInCompile = node.IncludeInCompile;
     }
 
     public ManuscriptNode Node { get; private set; }
@@ -72,6 +73,9 @@ public sealed partial class BinderNodeViewModel : ObservableObject
 
     [ObservableProperty]
     private int _charCount;
+
+    [ObservableProperty]
+    private bool _includeInCompile;
 
     public void UpdateNode(ManuscriptNode node)
     {

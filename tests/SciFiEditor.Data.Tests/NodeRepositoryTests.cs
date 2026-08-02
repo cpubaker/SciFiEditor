@@ -160,6 +160,27 @@ public class NodeRepositoryTests : IDisposable
     }
 
     [Fact]
+    public void Insert_DefaultsIncludeInCompileToTrue()
+    {
+        var node = CreateNode();
+
+        _repository.Insert(node);
+
+        _repository.GetById(node.Id)!.IncludeInCompile.Should().BeTrue();
+    }
+
+    [Fact]
+    public void UpdateIncludeInCompile_PersistsFalse()
+    {
+        var node = CreateNode();
+        _repository.Insert(node);
+
+        _repository.UpdateIncludeInCompile(node.Id, false, DateTime.UtcNow);
+
+        _repository.GetById(node.Id)!.IncludeInCompile.Should().BeFalse();
+    }
+
+    [Fact]
     public void GetProjectWordCount_SumsOnlyNonTrashedScenes()
     {
         var sceneA = CreateNode(NodeType.Scene, title: "Scene A");

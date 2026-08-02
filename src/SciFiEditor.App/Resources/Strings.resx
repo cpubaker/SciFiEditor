@@ -208,4 +208,22 @@
   <data name="StatsSaveGoals" xml:space="preserve">
     <value>Зберегти цілі</value>
   </data>
+  <data name="MenuCompile" xml:space="preserve">
+    <value>Компілювати...</value>
+  </data>
+  <data name="BinderIncludeInCompile" xml:space="preserve">
+    <value>Включити в компіляцію</value>
+  </data>
+  <data name="CompileWindowTitle" xml:space="preserve">
+    <value>Компіляція</value>
+  </data>
+  <data name="CompileFormatLabel" xml:space="preserve">
+    <value>Формат експорту</value>
+  </data>
+  <data name="CompileExportButton" xml:space="preserve">
+    <value>Експортувати...</value>
+  </data>
+  <data name="CompileSuccess" xml:space="preserve">
+    <value>Готово.</value>
+  </data>
 </root>
