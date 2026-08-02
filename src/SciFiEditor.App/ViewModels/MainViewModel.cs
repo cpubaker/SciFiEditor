@@ -7,6 +7,7 @@ using SciFiEditor.App.Resources;
 using SciFiEditor.App.Views;
 using SciFiEditor.Core.Manuscript;
 using SciFiEditor.Core.Projects;
+using SciFiEditor.Core.Stats;
 using SciFiEditor.Data;
 using SciFiEditor.Domain;
 using ILogger = Serilog.ILogger;
@@ -21,6 +22,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     private readonly ManuscriptFileService _fileService;
     private readonly SceneAutosaveCoordinator _autosaveCoordinator;
     private readonly WordCountCoordinator _wordCountCoordinator;
+    private readonly WritingStatsService _statsService;
     private readonly ILogger _logger;
     private bool _isLoadingContent;
     private int _sessionBaselineWordCount;
@@ -32,6 +34,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         ManuscriptFileService fileService,
         SceneAutosaveCoordinator autosaveCoordinator,
         WordCountCoordinator wordCountCoordinator,
+        WritingStatsService statsService,
         ILogger logger)
     {
         _projectService = projectService;
@@ -40,6 +43,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         _fileService = fileService;
         _autosaveCoordinator = autosaveCoordinator;
         _wordCountCoordinator = wordCountCoordinator;
+        _statsService = statsService;
         _logger = logger;
 
         _wordCountCoordinator.Counted += OnWordCountPersisted;
@@ -120,6 +124,11 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     {
         await _autosaveCoordinator.FlushAsync();
         await _wordCountCoordinator.FlushAsync();
+
+        if (_projectService.Current is not null)
+        {
+            _statsService.RecordSnapshot();
+        }
     }
 
     private void OnWordCountPersisted(Guid nodeId, int words, int chars)
@@ -134,6 +143,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             }
 
             RefreshProjectWordCount();
+            _statsService.RecordSnapshot();
         });
     }
 
@@ -155,6 +165,14 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
     [RelayCommand]
     private async Task SaveAsync() => await FlushAutosaveAsync();
+
+    [RelayCommand]
+    private void OpenStats()
+    {
+        var viewModel = new StatsViewModel(_statsService);
+        var window = new StatsWindow(viewModel) { Owner = Application.Current.MainWindow };
+        window.ShowDialog();
+    }
 
     [RelayCommand]
     private void NewProject()
@@ -345,6 +363,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         IsProjectOpen = true;
         RefreshRecentProjects();
         RefreshProjectWordCount(resetSessionBaseline);
+        _statsService.RecordSnapshot();
 
         if (selectedId is Guid id)
         {
