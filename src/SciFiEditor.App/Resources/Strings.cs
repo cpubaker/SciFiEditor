@@ -65,6 +65,19 @@ public static class Strings
     public static string CompileFormatLabel => Get("CompileFormatLabel");
     public static string CompileExportButton => Get("CompileExportButton");
     public static string CompileSuccess => Get("CompileSuccess");
+    public static string BinderSnapshots => Get("BinderSnapshots");
+    public static string SnapshotsWindowTitle => Get("SnapshotsWindowTitle");
+    public static string SnapshotTakeButton => Get("SnapshotTakeButton");
+    public static string SnapshotRestoreButton => Get("SnapshotRestoreButton");
+    public static string SnapshotRestoreConfirm => Get("SnapshotRestoreConfirm");
+    public static string SnapshotTaken => Get("SnapshotTaken");
+    public static string SnapshotRestored => Get("SnapshotRestored");
+    public static string MenuEntities => Get("MenuEntities");
+    public static string EntityWindowTitle => Get("EntityWindowTitle");
+    public static string EntityTabCharacters => Get("EntityTabCharacters");
+    public static string EntityTabLocations => Get("EntityTabLocations");
+    public static string EntityAddButton => Get("EntityAddButton");
+    public static string EntityDeleteButton => Get("EntityDeleteButton");
 
     private static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? name;

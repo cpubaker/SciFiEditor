@@ -72,6 +72,30 @@ public sealed class ProjectDatabase : IDisposable
                     daily_goal INTEGER NULL,
                     session_goal INTEGER NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS scene_snapshots (
+                    id TEXT PRIMARY KEY,
+                    node_id TEXT NOT NULL,
+                    created_at_utc TEXT NOT NULL,
+                    label TEXT NOT NULL,
+                    content_gzip BLOB NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS ix_scene_snapshots_node_id ON scene_snapshots(node_id);
+
+                CREATE TABLE IF NOT EXISTS entities (
+                    id TEXT PRIMARY KEY,
+                    entity_type TEXT NOT NULL,
+                    name TEXT NOT NULL,
+                    description TEXT NOT NULL DEFAULT '',
+                    created_at_utc TEXT NOT NULL,
+                    updated_at_utc TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS node_entities (
+                    node_id TEXT NOT NULL,
+                    entity_id TEXT NOT NULL,
+                    PRIMARY KEY (node_id, entity_id)
+                );
                 """;
             cmd.ExecuteNonQuery();
         }
