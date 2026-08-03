@@ -5,11 +5,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
 using SciFiEditor.App.Resources;
+using SciFiEditor.App.Theming;
 using SciFiEditor.App.Views;
 using SciFiEditor.Core.Compile;
 using SciFiEditor.Core.Entities;
 using SciFiEditor.Core.Manuscript;
 using SciFiEditor.Core.Projects;
+using SciFiEditor.Core.Search;
+using SciFiEditor.Core.Settings;
 using SciFiEditor.Core.Snapshots;
 using SciFiEditor.Core.Stats;
 using SciFiEditor.Data;
@@ -31,8 +34,11 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     private readonly ExportService _exportService;
     private readonly SnapshotService _snapshotService;
     private readonly EntityService _entityService;
+    private readonly SearchService _searchService;
+    private readonly AppSettingsService _appSettingsService;
     private readonly ILogger _logger;
     private readonly DispatcherTimer _previewTimer;
+    private SearchWindow? _searchWindow;
     private bool _isLoadingContent;
     private int _sessionBaselineWordCount;
 
@@ -48,6 +54,8 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         ExportService exportService,
         SnapshotService snapshotService,
         EntityService entityService,
+        SearchService searchService,
+        AppSettingsService appSettingsService,
         ILogger logger)
     {
         _projectService = projectService;
@@ -61,6 +69,8 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         _exportService = exportService;
         _snapshotService = snapshotService;
         _entityService = entityService;
+        _searchService = searchService;
+        _appSettingsService = appSettingsService;
         _logger = logger;
 
         _wordCountCoordinator.Counted += OnWordCountPersisted;
@@ -90,6 +100,9 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
     [ObservableProperty]
     private BinderNodeViewModel? _selectedNode;
+
+    [ObservableProperty]
+    private bool _isFocusMode;
 
     public ObservableCollection<BinderNodeViewModel> CorkboardNodes =>
         SelectedNode?.Children.Count > 0 ? SelectedNode.Children : RootNodes;
@@ -174,7 +187,20 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             if (SelectedNode is { NodeType: NodeType.Scene } scene)
             {
                 _snapshotService.RecordAutoSnapshotIfNeeded(scene.Id, EditorContent);
+                _ = IndexNodeSafeAsync(scene.Id);
             }
+        }
+    }
+
+    private async Task IndexNodeSafeAsync(Guid nodeId)
+    {
+        try
+        {
+            await _searchService.IndexNodeAsync(nodeId);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to index node {Id} for search", nodeId);
         }
     }
 
@@ -352,6 +378,45 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     }
 
     [RelayCommand]
+    private void OpenSearch()
+    {
+        if (_searchWindow is null || !_searchWindow.IsVisible)
+        {
+            var viewModel = new SearchViewModel(_searchService, NavigateToNode);
+            _searchWindow = new SearchWindow(viewModel) { Owner = Application.Current.MainWindow };
+            _searchWindow.Show();
+        }
+        else
+        {
+            _searchWindow.Activate();
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleTheme()
+    {
+        var newTheme = _appSettingsService.GetTheme() == AppTheme.Light ? AppTheme.Dark : AppTheme.Light;
+        _appSettingsService.SetTheme(newTheme);
+        ThemeManager.Apply(newTheme);
+    }
+
+    private void NavigateToNode(Guid nodeId)
+    {
+        var path = FindPath(RootNodes, nodeId);
+        if (path is null || path.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var ancestor in path.SkipLast(1))
+        {
+            ancestor.IsExpanded = true;
+        }
+
+        path[^1].IsSelected = true;
+    }
+
+    [RelayCommand]
     private void NewProject()
     {
         var dialog = new NewProjectWindow { Owner = Application.Current.MainWindow };
@@ -475,6 +540,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             var collection = parent?.Children ?? RootNodes;
             collection.Add(vm);
             vm.BeginRename();
+            _ = IndexNodeSafeAsync(created.Id);
         }
         catch (Exception ex)
         {
@@ -488,6 +554,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         try
         {
             _nodeService.Rename(node.Id, newTitle);
+            _ = IndexNodeSafeAsync(node.Id);
         }
         catch (Exception ex)
         {
@@ -501,6 +568,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         try
         {
             _nodeService.UpdateInspector(node.Id, node.Synopsis, node.Notes, node.Label, node.Status, node.TargetWordCount);
+            _ = IndexNodeSafeAsync(node.Id);
         }
         catch (Exception ex)
         {
@@ -541,10 +609,23 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         RefreshRecentProjects();
         RefreshProjectWordCount(resetSessionBaseline);
         _statsService.RecordSnapshot();
+        _ = EnsureSearchIndexPopulatedAsync();
 
         if (selectedId is Guid id)
         {
             SelectedNode = FindNode(RootNodes, id);
+        }
+    }
+
+    private async Task EnsureSearchIndexPopulatedAsync()
+    {
+        try
+        {
+            await _searchService.EnsureIndexPopulatedAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to populate search index");
         }
     }
 
@@ -576,6 +657,26 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
         Walk(nodes);
         return result;
+    }
+
+    private static List<BinderNodeViewModel>? FindPath(IEnumerable<BinderNodeViewModel> nodes, Guid id)
+    {
+        foreach (var node in nodes)
+        {
+            if (node.Id == id)
+            {
+                return [node];
+            }
+
+            var childPath = FindPath(node.Children, id);
+            if (childPath is not null)
+            {
+                childPath.Insert(0, node);
+                return childPath;
+            }
+        }
+
+        return null;
     }
 
     private static BinderNodeViewModel? FindNode(IEnumerable<BinderNodeViewModel> nodes, Guid id)

@@ -5,7 +5,9 @@
         xmlns:controls="clr-namespace:SciFiEditor.App.Controls"
         Title="{x:Static res:Strings.StatsWindowTitle}"
         Height="420" Width="620"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppWindowBackgroundBrush}"
+        Foreground="{DynamicResource AppWindowForegroundBrush}">
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

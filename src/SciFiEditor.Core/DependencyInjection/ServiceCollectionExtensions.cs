@@ -3,6 +3,8 @@ using SciFiEditor.Core.Compile;
 using SciFiEditor.Core.Entities;
 using SciFiEditor.Core.Manuscript;
 using SciFiEditor.Core.Projects;
+using SciFiEditor.Core.Search;
+using SciFiEditor.Core.Settings;
 using SciFiEditor.Core.Snapshots;
 using SciFiEditor.Core.Stats;
 using SciFiEditor.Data;
@@ -23,6 +25,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ExportService>();
         services.AddSingleton<SnapshotService>();
         services.AddSingleton<EntityService>();
+        services.AddSingleton<SearchService>();
+        services.AddSingleton<AppSettingsService>();
         services.AddSingleton(sp =>
         {
             var projectService = sp.GetRequiredService<ProjectService>();

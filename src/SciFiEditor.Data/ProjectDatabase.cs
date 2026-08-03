@@ -96,6 +96,15 @@ public sealed class ProjectDatabase : IDisposable
                     entity_id TEXT NOT NULL,
                     PRIMARY KEY (node_id, entity_id)
                 );
+
+                CREATE VIRTUAL TABLE IF NOT EXISTS node_fts USING fts5(
+                    node_id UNINDEXED,
+                    title,
+                    synopsis,
+                    notes,
+                    label,
+                    body
+                );
                 """;
             cmd.ExecuteNonQuery();
         }
