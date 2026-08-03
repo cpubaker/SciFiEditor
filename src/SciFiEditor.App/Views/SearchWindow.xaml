@@ -1,0 +1,39 @@
+<Window x:Class="SciFiEditor.App.Views.SearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:res="clr-namespace:SciFiEditor.App.Resources"
+        Title="{x:Static res:Strings.SearchWindowTitle}"
+        Height="420" Width="420"
+        ShowInTaskbar="False"
+        Background="{DynamicResource AppWindowBackgroundBrush}"
+        Foreground="{DynamicResource AppWindowForegroundBrush}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}"
+                     KeyDown="QueryTextBox_KeyDown" />
+            <Button Grid.Column="1" Content="{x:Static res:Strings.SearchButton}" Command="{Binding SearchCommand}"
+                    Margin="8,0,0,0" Width="100" />
+        </Grid>
+
+        <ListBox Grid.Row="1" ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}"
+                 MouseDoubleClick="ResultsListBox_MouseDoubleClick">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="0,4">
+                        <TextBlock Text="{Binding Title}" FontWeight="Bold" />
+                        <TextBlock Text="{Binding Snippet}" TextWrapping="Wrap" Opacity="0.8" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>

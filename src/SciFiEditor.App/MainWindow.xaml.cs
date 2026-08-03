@@ -1,6 +1,8 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SciFiEditor.App.Editor;
 using SciFiEditor.App.ViewModels;
 
 namespace SciFiEditor.App;
@@ -8,6 +10,9 @@ namespace SciFiEditor.App;
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
+    private readonly TypewriterScrollController _typewriterScroll;
+    private readonly ParagraphDimmingTransformer _dimmingTransformer = new();
+    private bool _isFocusModeActive;
 
     public MainWindow(MainViewModel viewModel)
     {
@@ -17,6 +22,58 @@ public partial class MainWindow : Window
 
         Deactivated += MainWindow_Deactivated;
         Closing += MainWindow_Closing;
+
+        FindReplaceBarControl.Attach(SceneEditor);
+        _typewriterScroll = new TypewriterScrollController(SceneEditor);
+        _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+    }
+
+    private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            FindReplaceBarControl.Open();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.F11)
+        {
+            _viewModel.IsFocusMode = !_viewModel.IsFocusMode;
+            e.Handled = true;
+        }
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(MainViewModel.IsFocusMode))
+        {
+            return;
+        }
+
+        if (_viewModel.IsFocusMode && !_isFocusModeActive)
+        {
+            _isFocusModeActive = true;
+            _typewriterScroll.Attach();
+            SceneEditor.TextArea.TextView.LineTransformers.Add(_dimmingTransformer);
+            SceneEditor.TextArea.Caret.PositionChanged += OnFocusModeCaretPositionChanged;
+            UpdateParagraphDimming();
+        }
+        else if (!_viewModel.IsFocusMode && _isFocusModeActive)
+        {
+            _isFocusModeActive = false;
+            _typewriterScroll.Detach();
+            SceneEditor.TextArea.TextView.LineTransformers.Remove(_dimmingTransformer);
+            SceneEditor.TextArea.Caret.PositionChanged -= OnFocusModeCaretPositionChanged;
+            SceneEditor.TextArea.TextView.Redraw();
+        }
+    }
+
+    private void OnFocusModeCaretPositionChanged(object? sender, EventArgs e) => UpdateParagraphDimming();
+
+    private void UpdateParagraphDimming()
+    {
+        var caretLine = SceneEditor.Document.GetLineByOffset(SceneEditor.CaretOffset).LineNumber;
+        _dimmingTransformer.UpdateCurrentParagraph(SceneEditor.Document, caretLine);
+        SceneEditor.TextArea.TextView.Redraw();
     }
 
     private async void BinderTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

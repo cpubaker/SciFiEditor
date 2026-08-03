@@ -4,7 +4,9 @@
         xmlns:res="clr-namespace:SciFiEditor.App.Resources"
         Title="{x:Static res:Strings.SnapshotsWindowTitle}"
         Height="380" Width="420"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppWindowBackgroundBrush}"
+        Foreground="{DynamicResource AppWindowForegroundBrush}">
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

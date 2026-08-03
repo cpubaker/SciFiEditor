@@ -12,6 +12,7 @@ public sealed class OpenProject : IDisposable
         Stats = new StatsRepository(Database);
         Snapshots = new SnapshotRepository(Database);
         Entities = new EntityRepository(Database);
+        Search = new SearchRepository(Database);
     }
 
     public string RootPath { get; }
@@ -20,6 +21,7 @@ public sealed class OpenProject : IDisposable
     public StatsRepository Stats { get; }
     public SnapshotRepository Snapshots { get; }
     public EntityRepository Entities { get; }
+    public SearchRepository Search { get; }
 
     public void Dispose() => Database.Dispose();
 }

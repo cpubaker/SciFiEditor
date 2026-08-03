@@ -3,8 +3,10 @@ using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SciFiEditor.App.Theming;
 using SciFiEditor.App.ViewModels;
 using SciFiEditor.Core.DependencyInjection;
+using SciFiEditor.Core.Settings;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -45,6 +47,9 @@ public partial class App : Application
         DispatcherUnhandledException += OnDispatcherUnhandledException;
 
         _host.Start();
+
+        var appSettingsService = _host.Services.GetRequiredService<AppSettingsService>();
+        ThemeManager.Apply(appSettingsService.GetTheme());
 
         var mainWindow = _host.Services.GetRequiredService<MainWindow>();
         mainWindow.Show();

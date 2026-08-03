@@ -78,6 +78,15 @@ public static class Strings
     public static string EntityTabLocations => Get("EntityTabLocations");
     public static string EntityAddButton => Get("EntityAddButton");
     public static string EntityDeleteButton => Get("EntityDeleteButton");
+    public static string MenuSearch => Get("MenuSearch");
+    public static string SearchWindowTitle => Get("SearchWindowTitle");
+    public static string SearchButton => Get("SearchButton");
+    public static string FindNext => Get("FindNext");
+    public static string FindPrevious => Get("FindPrevious");
+    public static string ReplaceOne => Get("ReplaceOne");
+    public static string ReplaceAll => Get("ReplaceAll");
+    public static string MenuFocusMode => Get("MenuFocusMode");
+    public static string MenuToggleTheme => Get("MenuToggleTheme");
 
     private static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? name;

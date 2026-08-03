@@ -265,4 +265,31 @@
   <data name="EntityDeleteButton" xml:space="preserve">
     <value>Видалити</value>
   </data>
+  <data name="MenuSearch" xml:space="preserve">
+    <value>Пошук...</value>
+  </data>
+  <data name="SearchWindowTitle" xml:space="preserve">
+    <value>Пошук</value>
+  </data>
+  <data name="SearchButton" xml:space="preserve">
+    <value>Знайти</value>
+  </data>
+  <data name="FindNext" xml:space="preserve">
+    <value>Далі</value>
+  </data>
+  <data name="FindPrevious" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="ReplaceOne" xml:space="preserve">
+    <value>Замінити</value>
+  </data>
+  <data name="ReplaceAll" xml:space="preserve">
+    <value>Замінити все</value>
+  </data>
+  <data name="MenuFocusMode" xml:space="preserve">
+    <value>Режим фокусування (F11)</value>
+  </data>
+  <data name="MenuToggleTheme" xml:space="preserve">
+    <value>Перемкнути тему</value>
+  </data>
 </root>

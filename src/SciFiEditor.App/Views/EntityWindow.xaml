@@ -4,7 +4,9 @@
         xmlns:res="clr-namespace:SciFiEditor.App.Resources"
         Title="{x:Static res:Strings.EntityWindowTitle}"
         Height="420" Width="360"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppWindowBackgroundBrush}"
+        Foreground="{DynamicResource AppWindowForegroundBrush}">
     <TabControl Margin="8">
         <TabItem Header="{x:Static res:Strings.EntityTabCharacters}">
             <Grid Margin="8">

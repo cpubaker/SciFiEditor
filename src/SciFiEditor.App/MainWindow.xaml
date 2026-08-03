@@ -8,16 +8,22 @@
         xmlns:res="clr-namespace:SciFiEditor.App.Resources"
         xmlns:conv="clr-namespace:SciFiEditor.App.Converters"
         xmlns:behaviors="clr-namespace:SciFiEditor.App.Behaviors"
+        xmlns:controls="clr-namespace:SciFiEditor.App.Controls"
         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
         Title="SciFiEditor" Height="720" Width="1280"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        PreviewKeyDown="MainWindow_PreviewKeyDown"
+        Background="{DynamicResource AppWindowBackgroundBrush}"
+        Foreground="{DynamicResource AppWindowForegroundBrush}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
         <conv:NodeStatusToBrushConverter x:Key="NodeStatusToBrushConverter" />
+        <conv:FocusModeGridLengthConverter x:Key="FocusModeGridLengthConverter" />
+        <conv:FocusModeMinWidthConverter x:Key="FocusModeMinWidthConverter" />
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -37,13 +43,19 @@
                 <MenuItem Header="{x:Static res:Strings.MenuSave}" Command="{Binding SaveCommand}" />
             </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuEdit}" />
-            <MenuItem Header="{x:Static res:Strings.MenuView}" />
+            <MenuItem Header="{x:Static res:Strings.MenuView}">
+                <MenuItem Header="{x:Static res:Strings.MenuFocusMode}" IsCheckable="True"
+                          IsChecked="{Binding IsFocusMode, Mode=TwoWay}" />
+                <MenuItem Header="{x:Static res:Strings.MenuToggleTheme}" Command="{Binding ToggleThemeCommand}" />
+            </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuProject}">
                 <MenuItem Header="{x:Static res:Strings.MenuStatistics}" Command="{Binding OpenStatsCommand}"
                           IsEnabled="{Binding IsProjectOpen}" />
                 <MenuItem Header="{x:Static res:Strings.MenuCompile}" Command="{Binding OpenCompileCommand}"
                           IsEnabled="{Binding IsProjectOpen}" />
                 <MenuItem Header="{x:Static res:Strings.MenuEntities}" Command="{Binding OpenEntitiesCommand}"
+                          IsEnabled="{Binding IsProjectOpen}" />
+                <MenuItem Header="{x:Static res:Strings.MenuSearch}" Command="{Binding OpenSearchCommand}"
                           IsEnabled="{Binding IsProjectOpen}" />
             </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuHelp}" />
@@ -76,14 +88,17 @@
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220" MinWidth="150" />
-                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="{Binding IsFocusMode, Converter={StaticResource FocusModeGridLengthConverter}, ConverterParameter=220}"
+                                  MinWidth="{Binding IsFocusMode, Converter={StaticResource FocusModeMinWidthConverter}, ConverterParameter=150}" />
+                <ColumnDefinition Width="{Binding IsFocusMode, Converter={StaticResource FocusModeGridLengthConverter}, ConverterParameter=5}" />
                 <ColumnDefinition Width="3*" MinWidth="300" />
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="280" MinWidth="200" />
+                <ColumnDefinition Width="{Binding IsFocusMode, Converter={StaticResource FocusModeGridLengthConverter}, ConverterParameter=5}" />
+                <ColumnDefinition Width="{Binding IsFocusMode, Converter={StaticResource FocusModeGridLengthConverter}, ConverterParameter=280}"
+                                  MinWidth="{Binding IsFocusMode, Converter={StaticResource FocusModeMinWidthConverter}, ConverterParameter=200}" />
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="0,0,1,0">
+            <Border Grid.Column="0" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="0,0,1,0"
+                    Visibility="{Binding IsFocusMode, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                 <TreeView x:Name="BinderTreeView" ItemsSource="{Binding RootNodes}"
                           VirtualizingPanel.IsVirtualizing="True"
                           VirtualizingPanel.VirtualizationMode="Recycling"
@@ -134,6 +149,7 @@
                         <Style TargetType="TreeViewItem">
                             <Setter Property="ContextMenu" Value="{StaticResource BinderNodeContextMenu}" />
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                         </Style>
                     </TreeView.ItemContainerStyle>
                     <TreeView.ItemTemplate>
@@ -152,15 +168,24 @@
                 </TreeView>
             </Border>
 
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" />
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+                          Visibility="{Binding IsFocusMode, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
 
             <TabControl Grid.Column="2">
                 <TabItem Header="{x:Static res:Strings.TabText}">
-                    <avalonEdit:TextEditor behaviors:AvalonEditBehavior.BindableText="{Binding EditorContent, Mode=TwoWay}"
-                                            IsEnabled="{Binding IsSceneSelected}"
-                                            FontFamily="Consolas" FontSize="14"
-                                            WordWrap="True"
-                                            ShowLineNumbers="False" />
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <controls:FindReplaceBar x:Name="FindReplaceBarControl" Grid.Row="0" />
+                        <avalonEdit:TextEditor x:Name="SceneEditor" Grid.Row="1"
+                                                behaviors:AvalonEditBehavior.BindableText="{Binding EditorContent, Mode=TwoWay}"
+                                                IsEnabled="{Binding IsSceneSelected}"
+                                                FontFamily="Consolas" FontSize="14"
+                                                WordWrap="True"
+                                                ShowLineNumbers="False" />
+                    </Grid>
                 </TabItem>
                 <TabItem Header="{x:Static res:Strings.TabBoard}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -173,8 +198,8 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Width="180" Height="140" Margin="6" Padding="8"
-                                            BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="1"
-                                            Background="{x:Static SystemColors.WindowBrush}">
+                                            BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1"
+                                            Background="{DynamicResource AppPanelBackgroundBrush}">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
@@ -206,9 +231,11 @@
                 </TabItem>
             </TabControl>
 
-            <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" />
+            <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+                          Visibility="{Binding IsFocusMode, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
 
-            <Border Grid.Column="4" BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="1,0,0,0">
+            <Border Grid.Column="4" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1,0,0,0"
+                    Visibility="{Binding IsFocusMode, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="8" DataContext="{Binding SelectedNode}">
                         <TextBlock Text="{x:Static res:Strings.InspectorSynopsis}" Margin="0,0,0,4" />
