@@ -17,6 +17,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+        <conv:NodeStatusToBrushConverter x:Key="NodeStatusToBrushConverter" />
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -41,6 +42,8 @@
                 <MenuItem Header="{x:Static res:Strings.MenuStatistics}" Command="{Binding OpenStatsCommand}"
                           IsEnabled="{Binding IsProjectOpen}" />
                 <MenuItem Header="{x:Static res:Strings.MenuCompile}" Command="{Binding OpenCompileCommand}"
+                          IsEnabled="{Binding IsProjectOpen}" />
+                <MenuItem Header="{x:Static res:Strings.MenuEntities}" Command="{Binding OpenEntitiesCommand}"
                           IsEnabled="{Binding IsProjectOpen}" />
             </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuHelp}" />
@@ -121,6 +124,10 @@
                             <MenuItem Header="{x:Static res:Strings.BinderMoveToTrash}"
                                       Command="{Binding DataContext.MoveToTrashCommand, ElementName=BinderTreeView}"
                                       CommandParameter="{Binding}" />
+                            <Separator />
+                            <MenuItem Header="{x:Static res:Strings.BinderSnapshots}"
+                                      Command="{Binding DataContext.OpenSnapshotsCommand, ElementName=BinderTreeView}"
+                                      CommandParameter="{Binding}" />
                         </ContextMenu>
                     </TreeView.Resources>
                     <TreeView.ItemContainerStyle>
@@ -156,8 +163,43 @@
                                             ShowLineNumbers="False" />
                 </TabItem>
                 <TabItem Header="{x:Static res:Strings.TabBoard}">
-                    <!-- Corkboard, wired up in M5 -->
-                    <Grid />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding CorkboardNodes}" Margin="8">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="180" Height="140" Margin="6" Padding="8"
+                                            BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="1"
+                                            Background="{x:Static SystemColors.WindowBrush}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Title}" FontWeight="Bold"
+                                                           TextTrimming="CharacterEllipsis" />
+                                                <Ellipse Grid.Column="1" Width="10" Height="10"
+                                                         Fill="{Binding Status, Converter={StaticResource NodeStatusToBrushConverter}}" />
+                                            </Grid>
+                                            <TextBox Grid.Row="1" Text="{Binding Synopsis, UpdateSourceTrigger=PropertyChanged}"
+                                                     AcceptsReturn="True" TextWrapping="Wrap" BorderThickness="0" Background="Transparent"
+                                                     Margin="0,4,0,0" VerticalScrollBarVisibility="Auto"
+                                                     LostFocus="InspectorField_LostFocus" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </TabItem>
                 <TabItem Header="{x:Static res:Strings.TabPreview}">
                     <wv2:WebView2 behaviors:WebView2Behavior.BindableHtml="{Binding PreviewHtml}" />
@@ -194,6 +236,28 @@
                         <TextBlock Text="{x:Static res:Strings.InspectorTargetWordCount}" Margin="0,12,0,4" />
                         <TextBox Text="{Binding TargetWordCount, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
                                  LostFocus="InspectorField_LostFocus" />
+
+                        <TextBlock Text="{x:Static res:Strings.EntityTabCharacters}" Margin="0,12,0,4" FontWeight="Bold" />
+                        <ItemsControl ItemsSource="{Binding DataContext.CharacterLinkOptions, ElementName=RootWindow}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsLinked, Mode=OneWay}"
+                                              Command="{Binding DataContext.ToggleEntityLinkCommand, ElementName=RootWindow}"
+                                              CommandParameter="{Binding}" Margin="0,2" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="{x:Static res:Strings.EntityTabLocations}" Margin="0,12,0,4" FontWeight="Bold" />
+                        <ItemsControl ItemsSource="{Binding DataContext.LocationLinkOptions, ElementName=RootWindow}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsLinked, Mode=OneWay}"
+                                              Command="{Binding DataContext.ToggleEntityLinkCommand, ElementName=RootWindow}"
+                                              CommandParameter="{Binding}" Margin="0,2" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </ScrollViewer>
             </Border>

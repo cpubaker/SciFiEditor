@@ -7,8 +7,10 @@ using GongSolutions.Wpf.DragDrop;
 using SciFiEditor.App.Resources;
 using SciFiEditor.App.Views;
 using SciFiEditor.Core.Compile;
+using SciFiEditor.Core.Entities;
 using SciFiEditor.Core.Manuscript;
 using SciFiEditor.Core.Projects;
+using SciFiEditor.Core.Snapshots;
 using SciFiEditor.Core.Stats;
 using SciFiEditor.Data;
 using SciFiEditor.Domain;
@@ -27,6 +29,8 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     private readonly WritingStatsService _statsService;
     private readonly CompileService _compileService;
     private readonly ExportService _exportService;
+    private readonly SnapshotService _snapshotService;
+    private readonly EntityService _entityService;
     private readonly ILogger _logger;
     private readonly DispatcherTimer _previewTimer;
     private bool _isLoadingContent;
@@ -42,6 +46,8 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         WritingStatsService statsService,
         CompileService compileService,
         ExportService exportService,
+        SnapshotService snapshotService,
+        EntityService entityService,
         ILogger logger)
     {
         _projectService = projectService;
@@ -53,6 +59,8 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         _statsService = statsService;
         _compileService = compileService;
         _exportService = exportService;
+        _snapshotService = snapshotService;
+        _entityService = entityService;
         _logger = logger;
 
         _wordCountCoordinator.Counted += OnWordCountPersisted;
@@ -69,6 +77,8 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
     public ObservableCollection<BinderNodeViewModel> RootNodes { get; } = new();
     public ObservableCollection<RecentProjectEntry> RecentProjects { get; } = new();
+    public ObservableCollection<EntityLinkOption> CharacterLinkOptions { get; } = new();
+    public ObservableCollection<EntityLinkOption> LocationLinkOptions { get; } = new();
 
     public IReadOnlyList<NodeStatusOption> StatusOptions { get; } =
     [
@@ -80,6 +90,11 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
     [ObservableProperty]
     private BinderNodeViewModel? _selectedNode;
+
+    public ObservableCollection<BinderNodeViewModel> CorkboardNodes =>
+        SelectedNode?.Children.Count > 0 ? SelectedNode.Children : RootNodes;
+
+    partial void OnSelectedNodeChanged(BinderNodeViewModel? value) => OnPropertyChanged(nameof(CorkboardNodes));
 
     [ObservableProperty]
     private string _statusText = Strings.StatusReady;
@@ -143,6 +158,8 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
         _previewTimer.Stop();
         PreviewHtml = MarkdownPreviewService.ToHtml(EditorContent);
+
+        RefreshEntityLinkOptions();
     }
 
     public async Task FlushAutosaveAsync()
@@ -153,6 +170,11 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         if (_projectService.Current is not null)
         {
             _statsService.RecordSnapshot();
+
+            if (SelectedNode is { NodeType: NodeType.Scene } scene)
+            {
+                _snapshotService.RecordAutoSnapshotIfNeeded(scene.Id, EditorContent);
+            }
         }
     }
 
@@ -205,6 +227,106 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         var viewModel = new CompileViewModel(_compileService, _exportService);
         var window = new CompileWindow(viewModel) { Owner = Application.Current.MainWindow };
         window.ShowDialog();
+    }
+
+    [RelayCommand]
+    private void OpenSnapshots(BinderNodeViewModel? node)
+    {
+        if (node is null || node.NodeType != NodeType.Scene)
+        {
+            return;
+        }
+
+        var viewModel = new SnapshotViewModel(_snapshotService, node.Id);
+        var window = new SnapshotsWindow(viewModel) { Owner = Application.Current.MainWindow };
+        window.ShowDialog();
+
+        if (viewModel.RestoredContent is not { } restoredContent)
+        {
+            return;
+        }
+
+        var (words, chars) = WordCountService.Count(restoredContent);
+        _nodeService.UpdateWordCounts(node.Id, words, chars);
+        node.UpdateWordCount(words, chars);
+
+        if (SelectedNode?.Id == node.Id)
+        {
+            _isLoadingContent = true;
+            EditorContent = restoredContent;
+            _isLoadingContent = false;
+            SceneWordCount = words;
+            SceneCharCount = chars;
+            _previewTimer.Stop();
+            PreviewHtml = MarkdownPreviewService.ToHtml(EditorContent);
+        }
+
+        RefreshProjectWordCount();
+    }
+
+    [RelayCommand]
+    private void OpenEntities()
+    {
+        var viewModel = new EntityViewModel(_entityService);
+        var window = new EntityWindow(viewModel) { Owner = Application.Current.MainWindow };
+        window.ShowDialog();
+        RefreshEntityLinkOptions();
+    }
+
+    [RelayCommand]
+    private void ToggleEntityLink(EntityLinkOption? option)
+    {
+        if (option is null || SelectedNode is null || SelectedNode.IsTrashNode)
+        {
+            return;
+        }
+
+        option.IsLinked = !option.IsLinked;
+        PersistEntityLinks();
+    }
+
+    private void PersistEntityLinks()
+    {
+        if (SelectedNode is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var linkedIds = CharacterLinkOptions.Concat(LocationLinkOptions)
+                .Where(o => o.IsLinked)
+                .Select(o => o.EntityId);
+            _entityService.SetLinksForNode(SelectedNode.Id, linkedIds);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to update entity links for node {Id}", SelectedNode.Id);
+            ShowError(ex.Message);
+        }
+    }
+
+    private void RefreshEntityLinkOptions()
+    {
+        CharacterLinkOptions.Clear();
+        LocationLinkOptions.Clear();
+
+        if (SelectedNode is null || SelectedNode.IsTrashNode || _projectService.Current is null)
+        {
+            return;
+        }
+
+        var linkedIds = _entityService.GetForNode(SelectedNode.Id).Select(e => e.Id).ToHashSet();
+
+        foreach (var character in _entityService.GetAll(EntityType.Character))
+        {
+            CharacterLinkOptions.Add(new EntityLinkOption(character.Id, character.Name, linkedIds.Contains(character.Id)));
+        }
+
+        foreach (var location in _entityService.GetAll(EntityType.Location))
+        {
+            LocationLinkOptions.Add(new EntityLinkOption(location.Id, location.Name, linkedIds.Contains(location.Id)));
+        }
     }
 
     [RelayCommand]

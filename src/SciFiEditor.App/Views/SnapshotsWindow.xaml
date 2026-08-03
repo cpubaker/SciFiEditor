@@ -1,0 +1,39 @@
+<Window x:Class="SciFiEditor.App.Views.SnapshotsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:res="clr-namespace:SciFiEditor.App.Resources"
+        Title="{x:Static res:Strings.SnapshotsWindowTitle}"
+        Height="380" Width="420"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ListBox Grid.Row="0" ItemsSource="{Binding History}" SelectedItem="{Binding SelectedSnapshot}" Margin="0,0,0,8">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} — {1:yyyy-MM-dd HH:mm}">
+                                <Binding Path="Label" />
+                                <Binding Path="CreatedAtUtc" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="{x:Static res:Strings.SnapshotTakeButton}" Command="{Binding TakeSnapshotCommand}"
+                    Width="140" Margin="0,0,8,0" />
+            <Button Content="{x:Static res:Strings.SnapshotRestoreButton}" Command="{Binding RestoreCommand}"
+                    Width="140" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+    </Grid>
+</Window>

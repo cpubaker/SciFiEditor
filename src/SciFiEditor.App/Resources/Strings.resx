@@ -226,4 +226,43 @@
   <data name="CompileSuccess" xml:space="preserve">
     <value>Готово.</value>
   </data>
+  <data name="BinderSnapshots" xml:space="preserve">
+    <value>Знімки...</value>
+  </data>
+  <data name="SnapshotsWindowTitle" xml:space="preserve">
+    <value>Історія версій</value>
+  </data>
+  <data name="SnapshotTakeButton" xml:space="preserve">
+    <value>Зробити знімок</value>
+  </data>
+  <data name="SnapshotRestoreButton" xml:space="preserve">
+    <value>Відновити</value>
+  </data>
+  <data name="SnapshotRestoreConfirm" xml:space="preserve">
+    <value>Відновити цю версію? Поточний текст сцени буде замінено.</value>
+  </data>
+  <data name="SnapshotTaken" xml:space="preserve">
+    <value>Знімок збережено.</value>
+  </data>
+  <data name="SnapshotRestored" xml:space="preserve">
+    <value>Відновлено.</value>
+  </data>
+  <data name="MenuEntities" xml:space="preserve">
+    <value>Персонажі та локації...</value>
+  </data>
+  <data name="EntityWindowTitle" xml:space="preserve">
+    <value>Персонажі та локації</value>
+  </data>
+  <data name="EntityTabCharacters" xml:space="preserve">
+    <value>Персонажі</value>
+  </data>
+  <data name="EntityTabLocations" xml:space="preserve">
+    <value>Локації</value>
+  </data>
+  <data name="EntityAddButton" xml:space="preserve">
+    <value>Додати</value>
+  </data>
+  <data name="EntityDeleteButton" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
 </root>
