@@ -150,12 +150,14 @@
                             <Setter Property="ContextMenu" Value="{StaticResource BinderNodeContextMenu}" />
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                            <Setter Property="Foreground" Value="{DynamicResource AppWindowForegroundBrush}" />
                         </Style>
                     </TreeView.ItemContainerStyle>
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                             <Grid>
                                 <TextBlock Text="{Binding Title}"
+                                           Foreground="{DynamicResource AppWindowForegroundBrush}"
                                            Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
                                 <TextBox Text="{Binding EditTitle, UpdateSourceTrigger=PropertyChanged}"
                                          Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -182,6 +184,8 @@
                         <avalonEdit:TextEditor x:Name="SceneEditor" Grid.Row="1"
                                                 behaviors:AvalonEditBehavior.BindableText="{Binding EditorContent, Mode=TwoWay}"
                                                 IsEnabled="{Binding IsSceneSelected}"
+                                                Background="{DynamicResource AppWindowBackgroundBrush}"
+                                                Foreground="{DynamicResource AppWindowForegroundBrush}"
                                                 FontFamily="Consolas" FontSize="14"
                                                 WordWrap="True"
                                                 ShowLineNumbers="False" />
