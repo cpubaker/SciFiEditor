@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using SciFiEditor.App.Editor;
 using SciFiEditor.App.ViewModels;
+using SciFiEditor.Domain;
 
 namespace SciFiEditor.App;
 
@@ -40,6 +41,22 @@ public partial class MainWindow : Window
             _viewModel.IsFocusMode = !_viewModel.IsFocusMode;
             e.Handled = true;
         }
+        else if (e.Key == Key.N && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            _viewModel.AddChapterCommand.Execute(CurrentFolder());
+            e.Handled = true;
+        }
+        else if (e.Key == Key.N && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            _viewModel.AddSceneCommand.Execute(CurrentFolder());
+            e.Handled = true;
+        }
+    }
+
+    private BinderNodeViewModel? CurrentFolder()
+    {
+        var selected = _viewModel.SelectedNode;
+        return selected is { NodeType: NodeType.Folder or NodeType.Chapter } ? selected : null;
     }
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
