@@ -131,46 +131,50 @@
                           dd:DragDrop.UseDefaultDragAdorner="True">
                     <TreeView.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="{x:Static res:Strings.BinderAddFolder}" Command="{Binding AddFolderCommand}" />
-                            <MenuItem Header="{x:Static res:Strings.BinderAddChapter}" Command="{Binding AddChapterCommand}" />
-                            <MenuItem Header="{x:Static res:Strings.BinderAddScene}" Command="{Binding AddSceneCommand}" />
+                            <MenuItem Header="{x:Static res:Strings.BinderAddFolder}"
+                                      Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="{x:Static res:Strings.BinderAddChapter}"
+                                      Command="{Binding PlacementTarget.DataContext.AddChapterCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="{x:Static res:Strings.BinderAddScene}"
+                                      Command="{Binding PlacementTarget.DataContext.AddSceneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                         </ContextMenu>
                     </TreeView.ContextMenu>
                     <TreeView.Resources>
                         <ContextMenu x:Key="BinderNodeContextMenu">
                             <MenuItem Header="{x:Static res:Strings.BinderAddFolder}"
-                                      Command="{Binding DataContext.AddFolderCommand, ElementName=BinderTreeView}"
-                                      CommandParameter="{Binding}" />
+                                      Command="{Binding PlacementTarget.Tag.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                             <MenuItem Header="{x:Static res:Strings.BinderAddChapter}"
-                                      Command="{Binding DataContext.AddChapterCommand, ElementName=BinderTreeView}"
-                                      CommandParameter="{Binding}" />
+                                      Command="{Binding PlacementTarget.Tag.AddChapterCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                             <MenuItem Header="{x:Static res:Strings.BinderAddScene}"
-                                      Command="{Binding DataContext.AddSceneCommand, ElementName=BinderTreeView}"
-                                      CommandParameter="{Binding}" />
+                                      Command="{Binding PlacementTarget.Tag.AddSceneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                             <Separator />
                             <MenuItem Header="{x:Static res:Strings.BinderIncludeInCompile}" IsCheckable="True"
-                                      IsChecked="{Binding IncludeInCompile, Mode=OneWay}"
-                                      Command="{Binding DataContext.ToggleIncludeInCompileCommand, ElementName=BinderTreeView}"
-                                      CommandParameter="{Binding}" />
+                                      IsChecked="{Binding PlacementTarget.DataContext.IncludeInCompile, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=OneWay}"
+                                      Command="{Binding PlacementTarget.Tag.ToggleIncludeInCompileCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                             <Separator />
                             <MenuItem Header="{x:Static res:Strings.BinderRename}"
-                                      Command="{Binding DataContext.RenameCommand, ElementName=BinderTreeView}"
-                                      CommandParameter="{Binding}" />
+                                      Command="{Binding PlacementTarget.Tag.RenameCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                             <MenuItem Header="{x:Static res:Strings.BinderDuplicate}"
-                                      Command="{Binding DataContext.DuplicateCommand, ElementName=BinderTreeView}"
-                                      CommandParameter="{Binding}" />
+                                      Command="{Binding PlacementTarget.Tag.DuplicateCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                             <MenuItem Header="{x:Static res:Strings.BinderMoveToTrash}"
-                                      Command="{Binding DataContext.MoveToTrashCommand, ElementName=BinderTreeView}"
-                                      CommandParameter="{Binding}" />
+                                      Command="{Binding PlacementTarget.Tag.MoveToTrashCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                             <Separator />
                             <MenuItem Header="{x:Static res:Strings.BinderSnapshots}"
-                                      Command="{Binding DataContext.OpenSnapshotsCommand, ElementName=BinderTreeView}"
-                                      CommandParameter="{Binding}" />
+                                      Command="{Binding PlacementTarget.Tag.OpenSnapshotsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                         </ContextMenu>
                     </TreeView.Resources>
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="TreeViewItem">
                             <Setter Property="ContextMenu" Value="{StaticResource BinderNodeContextMenu}" />
+                            <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=TreeView}}" />
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                             <Setter Property="Foreground" Value="{DynamicResource AppWindowForegroundBrush}" />
