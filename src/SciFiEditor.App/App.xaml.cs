@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SciFiEditor.App.Theming;
 using SciFiEditor.App.ViewModels;
+using SciFiEditor.App.Views;
 using SciFiEditor.Core.DependencyInjection;
 using SciFiEditor.Core.Settings;
 using Serilog;
@@ -51,7 +52,15 @@ public partial class App : Application
         var appSettingsService = _host.Services.GetRequiredService<AppSettingsService>();
         ThemeManager.Apply(appSettingsService.GetTheme());
 
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+        var mainViewModel = _host.Services.GetRequiredService<MainViewModel>();
+        var startupWindow = new StartupWindow(mainViewModel);
+        startupWindow.ShowDialog();
+
         var mainWindow = _host.Services.GetRequiredService<MainWindow>();
+        MainWindow = mainWindow;
+        ShutdownMode = ShutdownMode.OnLastWindowClose;
         mainWindow.Show();
 
         Log.Information("SciFiEditor started");

@@ -87,6 +87,21 @@ public static class Strings
     public static string ReplaceAll => Get("ReplaceAll");
     public static string MenuFocusMode => Get("MenuFocusMode");
     public static string MenuToggleTheme => Get("MenuToggleTheme");
+    public static string MenuUndo => Get("MenuUndo");
+    public static string MenuRedo => Get("MenuRedo");
+    public static string MenuCut => Get("MenuCut");
+    public static string MenuCopy => Get("MenuCopy");
+    public static string MenuPaste => Get("MenuPaste");
+    public static string MenuSelectAll => Get("MenuSelectAll");
+    public static string MenuFind => Get("MenuFind");
+    public static string SeedSceneContent => Get("SeedSceneContent");
+    public static string StartupTitle => Get("StartupTitle");
+    public static string StartupSubtitle => Get("StartupSubtitle");
+    public static string StartupNewProject => Get("StartupNewProject");
+    public static string StartupOpenProject => Get("StartupOpenProject");
+    public static string StartupContinueWithoutProject => Get("StartupContinueWithoutProject");
+    public static string StartupRecentProjectsLabel => Get("StartupRecentProjectsLabel");
+    public static string StartupNoRecentProjects => Get("StartupNoRecentProjects");
 
     private static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? name;

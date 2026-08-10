@@ -1,0 +1,62 @@
+<Window x:Class="SciFiEditor.App.Views.StartupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:res="clr-namespace:SciFiEditor.App.Resources"
+        Title="{x:Static res:Strings.StartupTitle}"
+        Height="420" Width="640"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Icon="/Assets/app.ico"
+        Background="{DynamicResource AppWindowBackgroundBrush}"
+        Foreground="{DynamicResource AppWindowForegroundBrush}">
+    <Grid Margin="24">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="24" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0">
+            <TextBlock Text="{x:Static res:Strings.StartupTitle}" FontSize="24" FontWeight="Bold" Margin="0,0,0,4" />
+            <TextBlock Text="{x:Static res:Strings.StartupSubtitle}" Opacity="0.7" Margin="0,0,0,20" TextWrapping="Wrap" />
+
+            <Button x:Name="NewProjectButton" Content="{x:Static res:Strings.StartupNewProject}"
+                    HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,8"
+                    Click="NewProjectButton_Click" />
+            <Button x:Name="OpenProjectButton" Content="{x:Static res:Strings.StartupOpenProject}"
+                    HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,8"
+                    Click="OpenProjectButton_Click" />
+            <Button x:Name="ContinueButton" Content="{x:Static res:Strings.StartupContinueWithoutProject}"
+                    HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,8"
+                    Click="ContinueButton_Click" />
+        </StackPanel>
+
+        <Border Grid.Column="1" Background="{DynamicResource AppBorderBrush}" Width="1" HorizontalAlignment="Center" />
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="{x:Static res:Strings.StartupRecentProjectsLabel}"
+                       FontWeight="Bold" Margin="0,0,0,8" />
+
+            <ListBox x:Name="RecentProjectsList" Grid.Row="1"
+                     MouseDoubleClick="RecentProjectsList_MouseDoubleClick">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="2,4">
+                            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding Path}" FontSize="11" Opacity="0.6" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock x:Name="NoRecentProjectsText" Grid.Row="1" Text="{x:Static res:Strings.StartupNoRecentProjects}"
+                       Opacity="0.6" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2,4"
+                       Visibility="Collapsed" />
+        </Grid>
+    </Grid>
+</Window>

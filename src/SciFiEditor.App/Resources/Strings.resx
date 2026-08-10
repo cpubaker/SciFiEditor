@@ -292,4 +292,51 @@
   <data name="MenuToggleTheme" xml:space="preserve">
     <value>Перемкнути тему</value>
   </data>
+  <data name="MenuUndo" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="MenuRedo" xml:space="preserve">
+    <value>Повторити</value>
+  </data>
+  <data name="MenuCut" xml:space="preserve">
+    <value>Вирізати</value>
+  </data>
+  <data name="MenuCopy" xml:space="preserve">
+    <value>Копіювати</value>
+  </data>
+  <data name="MenuPaste" xml:space="preserve">
+    <value>Вставити</value>
+  </data>
+  <data name="MenuSelectAll" xml:space="preserve">
+    <value>Виділити все</value>
+  </data>
+  <data name="MenuFind" xml:space="preserve">
+    <value>Знайти...</value>
+  </data>
+  <data name="SeedSceneContent" xml:space="preserve">
+    <value>Ласкаво просимо до SciFiEditor!
+
+Це ваша перша сцена. Просто почніть друкувати тут — або видаліть цей текст і почніть власну історію.</value>
+  </data>
+  <data name="StartupTitle" xml:space="preserve">
+    <value>SciFiEditor</value>
+  </data>
+  <data name="StartupSubtitle" xml:space="preserve">
+    <value>Оберіть, з чого почати</value>
+  </data>
+  <data name="StartupNewProject" xml:space="preserve">
+    <value>Створити проєкт</value>
+  </data>
+  <data name="StartupOpenProject" xml:space="preserve">
+    <value>Відкрити проєкт...</value>
+  </data>
+  <data name="StartupContinueWithoutProject" xml:space="preserve">
+    <value>Продовжити без проєкту</value>
+  </data>
+  <data name="StartupRecentProjectsLabel" xml:space="preserve">
+    <value>Останні проєкти</value>
+  </data>
+  <data name="StartupNoRecentProjects" xml:space="preserve">
+    <value>Немає останніх проєктів</value>
+  </data>
 </root>

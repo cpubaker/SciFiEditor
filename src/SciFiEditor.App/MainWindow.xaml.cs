@@ -53,6 +53,11 @@ public partial class MainWindow : Window
         }
     }
 
+    private void FindMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        FindReplaceBarControl.Open();
+    }
+
     private BinderNodeViewModel? CurrentFolder()
     {
         var selected = _viewModel.SelectedNode;
