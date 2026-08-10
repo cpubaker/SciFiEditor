@@ -1,15 +1,17 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
-using ICSharpCode.AvalonEdit;
+using System.Windows.Media;
+using SciFiEditor.App.Editor;
 
 namespace SciFiEditor.App.Controls;
 
 public partial class FindReplaceBar : UserControl
 {
-    private readonly List<int> _matchOffsets = new();
-    private TextEditor? _editor;
+    private readonly List<Match> _matches = new();
+    private RichTextBox? _editor;
     private int _currentMatchIndex = -1;
 
     public FindReplaceBar()
@@ -17,7 +19,7 @@ public partial class FindReplaceBar : UserControl
         InitializeComponent();
     }
 
-    public void Attach(TextEditor editor)
+    public void Attach(RichTextBox editor)
     {
         _editor = editor;
     }
@@ -64,7 +66,7 @@ public partial class FindReplaceBar : UserControl
 
     private void RecomputeMatches()
     {
-        _matchOffsets.Clear();
+        _matches.Clear();
         _currentMatchIndex = -1;
 
         if (_editor is null || string.IsNullOrEmpty(FindTextBox.Text))
@@ -73,13 +75,16 @@ public partial class FindReplaceBar : UserControl
             return;
         }
 
-        var text = _editor.Text;
         var query = FindTextBox.Text;
-        var index = 0;
-        while ((index = text.IndexOf(query, index, StringComparison.OrdinalIgnoreCase)) >= 0)
+        foreach (var paragraph in RichTextNavigationHelper.EnumerateParagraphs(_editor.Document))
         {
-            _matchOffsets.Add(index);
-            index += query.Length;
+            var text = new TextRange(paragraph.ContentStart, paragraph.ContentEnd).Text;
+            var index = 0;
+            while ((index = text.IndexOf(query, index, StringComparison.OrdinalIgnoreCase)) >= 0)
+            {
+                _matches.Add(new Match(paragraph, index, query.Length));
+                index += query.Length;
+            }
         }
 
         UpdateMatchCountText();
@@ -87,9 +92,9 @@ public partial class FindReplaceBar : UserControl
 
     private void UpdateMatchCountText()
     {
-        MatchCountText.Text = _matchOffsets.Count == 0
+        MatchCountText.Text = _matches.Count == 0
             ? "0/0"
-            : $"{Math.Max(1, _currentMatchIndex + 1)}/{_matchOffsets.Count}";
+            : $"{Math.Max(1, _currentMatchIndex + 1)}/{_matches.Count}";
     }
 
     private void FindNext()
@@ -99,60 +104,87 @@ public partial class FindReplaceBar : UserControl
             return;
         }
 
-        if (_matchOffsets.Count == 0)
+        if (_matches.Count == 0)
         {
             RecomputeMatches();
         }
 
-        if (_matchOffsets.Count == 0)
+        if (_matches.Count == 0)
         {
             return;
         }
 
-        _currentMatchIndex = (_currentMatchIndex + 1) % _matchOffsets.Count;
+        _currentMatchIndex = (_currentMatchIndex + 1) % _matches.Count;
         SelectMatch(_currentMatchIndex);
     }
 
     private void FindPrevious()
     {
-        if (_editor is null || _matchOffsets.Count == 0)
+        if (_editor is null || _matches.Count == 0)
         {
             return;
         }
 
-        _currentMatchIndex = (_currentMatchIndex - 1 + _matchOffsets.Count) % _matchOffsets.Count;
+        _currentMatchIndex = (_currentMatchIndex - 1 + _matches.Count) % _matches.Count;
         SelectMatch(_currentMatchIndex);
     }
 
     private void SelectMatch(int index)
     {
-        if (_editor is null || index < 0 || index >= _matchOffsets.Count)
+        if (_editor is null || index < 0 || index >= _matches.Count)
         {
             return;
         }
 
-        var offset = _matchOffsets[index];
-        var length = FindTextBox.Text.Length;
-        _editor.Select(offset, length);
-        _editor.ScrollTo(_editor.Document.GetLineByOffset(offset).LineNumber, 0);
+        var match = _matches[index];
+        var start = match.Paragraph.ContentStart.GetPositionAtOffset(match.Offset);
+        var end = start?.GetPositionAtOffset(match.Length);
+        if (start is null || end is null)
+        {
+            return;
+        }
+
+        _editor.Selection.Select(start, end);
+        ScrollIntoView(start);
         UpdateMatchCountText();
+    }
+
+    private void ScrollIntoView(TextPointer pointer)
+    {
+        if (_editor is null)
+        {
+            return;
+        }
+
+        var rect = pointer.GetCharacterRect(LogicalDirection.Forward);
+        if (rect.Top < 0 || rect.Bottom > _editor.ActualHeight)
+        {
+            var target = _editor.VerticalOffset + rect.Top - (_editor.ActualHeight / 2) + (rect.Height / 2);
+            _editor.ScrollToVerticalOffset(Math.Max(0, target));
+        }
     }
 
     private void ReplaceCurrent()
     {
-        if (_editor is null || _currentMatchIndex < 0 || _currentMatchIndex >= _matchOffsets.Count)
+        if (_editor is null || _currentMatchIndex < 0 || _currentMatchIndex >= _matches.Count)
         {
             return;
         }
 
-        var offset = _matchOffsets[_currentMatchIndex];
-        var length = FindTextBox.Text.Length;
-        _editor.Document.Replace(offset, length, ReplaceTextBox.Text);
+        var match = _matches[_currentMatchIndex];
+        var start = match.Paragraph.ContentStart.GetPositionAtOffset(match.Offset);
+        var end = start?.GetPositionAtOffset(match.Length);
+        if (start is null || end is null)
+        {
+            return;
+        }
+
+        new TextRange(start, end).Text = ReplaceTextBox.Text;
         RecomputeMatches();
 
-        if (_matchOffsets.Count > 0)
+        if (_matches.Count > 0)
         {
-            _currentMatchIndex = Math.Min(_currentMatchIndex, _matchOffsets.Count - 1);
+            _currentMatchIndex = Math.Min(_currentMatchIndex, _matches.Count - 1);
             SelectMatch(_currentMatchIndex);
         }
     }
@@ -164,7 +196,9 @@ public partial class FindReplaceBar : UserControl
             return;
         }
 
-        _editor.Document.Text = ReplaceAllIgnoreCase(_editor.Text, FindTextBox.Text, ReplaceTextBox.Text);
+        var markdown = MarkdownFlowDocumentConverter.ToMarkdown(_editor.Document);
+        var replaced = ReplaceAllIgnoreCase(markdown, FindTextBox.Text, ReplaceTextBox.Text);
+        _editor.Document = MarkdownFlowDocumentConverter.ToFlowDocument(replaced);
         RecomputeMatches();
     }
 
@@ -183,4 +217,6 @@ public partial class FindReplaceBar : UserControl
         builder.Append(text, index, text.Length - index);
         return builder.ToString();
     }
+
+    private readonly record struct Match(Paragraph Paragraph, int Offset, int Length);
 }

@@ -9,7 +9,6 @@
         xmlns:conv="clr-namespace:SciFiEditor.App.Converters"
         xmlns:behaviors="clr-namespace:SciFiEditor.App.Behaviors"
         xmlns:controls="clr-namespace:SciFiEditor.App.Controls"
-        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
@@ -180,9 +179,26 @@
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                             <Grid>
-                                <TextBlock Text="{Binding Title}"
-                                           Foreground="{DynamicResource AppWindowForegroundBrush}"
-                                           Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                                <StackPanel Orientation="Horizontal"
+                                            Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                    <Viewbox Width="12" Height="12" Margin="0,0,5,0"
+                                             Visibility="{Binding IsTrashNode, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <Canvas Width="24" Height="24">
+                                            <Rectangle Canvas.Left="9" Canvas.Top="2" Width="6" Height="2"
+                                                       Fill="{DynamicResource AppWindowForegroundBrush}" />
+                                            <Rectangle Canvas.Left="6" Canvas.Top="4.5" Width="12" Height="2"
+                                                       Fill="{DynamicResource AppWindowForegroundBrush}" />
+                                            <Path Data="M7,7.5 L8,21 L16,21 L17,7.5 Z"
+                                                  Stroke="{DynamicResource AppWindowForegroundBrush}"
+                                                  StrokeThickness="1.4" />
+                                            <Line X1="10" Y1="10" X2="10.5" Y2="18"
+                                                  Stroke="{DynamicResource AppWindowForegroundBrush}" StrokeThickness="1.2" />
+                                            <Line X1="14" Y1="10" X2="13.5" Y2="18"
+                                                  Stroke="{DynamicResource AppWindowForegroundBrush}" StrokeThickness="1.2" />
+                                        </Canvas>
+                                    </Viewbox>
+                                    <TextBlock Text="{Binding Title}" Foreground="{DynamicResource AppWindowForegroundBrush}" />
+                                </StackPanel>
                                 <TextBox Text="{Binding EditTitle, UpdateSourceTrigger=PropertyChanged}"
                                          Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
                                          IsVisibleChanged="RenameTextBox_IsVisibleChanged"
@@ -202,17 +218,21 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <controls:FindReplaceBar x:Name="FindReplaceBarControl" Grid.Row="0" />
-                        <avalonEdit:TextEditor x:Name="SceneEditor" Grid.Row="1"
-                                                behaviors:AvalonEditBehavior.BindableText="{Binding EditorContent, Mode=TwoWay}"
-                                                IsEnabled="{Binding IsSceneSelected}"
-                                                Background="{DynamicResource AppWindowBackgroundBrush}"
-                                                Foreground="{DynamicResource AppWindowForegroundBrush}"
-                                                FontFamily="Consolas" FontSize="14"
-                                                WordWrap="True"
-                                                ShowLineNumbers="False" />
+                        <controls:FormattingToolbar x:Name="FormattingToolbarControl" Grid.Row="0"
+                                                     IsEnabled="{Binding IsSceneSelected}" />
+                        <controls:FindReplaceBar x:Name="FindReplaceBarControl" Grid.Row="1" />
+                        <RichTextBox x:Name="SceneEditor" Grid.Row="2"
+                                     behaviors:RichTextBoxMarkdownBehavior.BindableMarkdown="{Binding EditorContent, Mode=TwoWay}"
+                                     IsEnabled="{Binding IsSceneSelected}"
+                                     Background="{DynamicResource AppWindowBackgroundBrush}"
+                                     Foreground="{DynamicResource AppWindowForegroundBrush}"
+                                     BorderThickness="0"
+                                     FontFamily="Segoe UI" FontSize="14"
+                                     AcceptsReturn="True" AcceptsTab="True"
+                                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" />
                     </Grid>
                 </TabItem>
                 <TabItem Header="{x:Static res:Strings.TabBoard}">

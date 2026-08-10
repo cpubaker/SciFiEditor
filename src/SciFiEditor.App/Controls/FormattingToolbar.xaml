@@ -1,0 +1,60 @@
+<UserControl x:Class="SciFiEditor.App.Controls.FormattingToolbar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:SciFiEditor.App.Resources">
+    <Border Background="{DynamicResource AppPanelBackgroundBrush}"
+            BorderBrush="{DynamicResource AppBorderBrush}"
+            BorderThickness="0,0,0,1" Padding="6">
+        <StackPanel Orientation="Horizontal">
+            <ComboBox x:Name="HeadingComboBox" Width="90" Margin="0,0,8,0"
+                      SelectionChanged="HeadingComboBox_SelectionChanged">
+                <ComboBoxItem Content="{x:Static res:Strings.FormatHeadingNormal}" Tag="0" />
+                <ComboBoxItem Content="H1" Tag="1" />
+                <ComboBoxItem Content="H2" Tag="2" />
+                <ComboBoxItem Content="H3" Tag="3" />
+            </ComboBox>
+
+            <Button x:Name="ListButton" Content="≡" Width="28" Margin="0,0,8,0" Click="ListButton_Click"
+                    ToolTip="{x:Static res:Strings.FormatBulletList}">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{x:Static res:Strings.FormatBulletList}" Click="BulletList_Click" />
+                        <MenuItem Header="{x:Static res:Strings.FormatNumberedList}" Click="NumberedList_Click" />
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+
+            <ToggleButton x:Name="BoldButton" Content="B" FontWeight="Bold" Width="28" Margin="0,0,2,0"
+                          Click="BoldButton_Click" ToolTip="{x:Static res:Strings.FormatBold}" />
+            <ToggleButton x:Name="ItalicButton" Content="I" FontStyle="Italic" Width="28" Margin="0,0,2,0"
+                          Click="ItalicButton_Click" ToolTip="{x:Static res:Strings.FormatItalic}" />
+            <ToggleButton x:Name="StrikethroughButton" Width="28" Margin="0,0,8,0" Click="StrikethroughButton_Click"
+                          ToolTip="{x:Static res:Strings.FormatStrikethrough}">
+                <TextBlock Text="S" TextDecorations="Strikethrough" />
+            </ToggleButton>
+
+            <Button x:Name="LinkButton" Width="28" Margin="0,0,8,0" Click="LinkButton_Click"
+                    ToolTip="{x:Static res:Strings.FormatLink}">
+                <Viewbox Width="13" Height="13">
+                    <Canvas Width="24" Height="24">
+                        <Ellipse Canvas.Left="2" Canvas.Top="9" Width="11" Height="11"
+                                 Stroke="{DynamicResource AppWindowForegroundBrush}" StrokeThickness="2.4" />
+                        <Ellipse Canvas.Left="11" Canvas.Top="4" Width="11" Height="11"
+                                 Stroke="{DynamicResource AppWindowForegroundBrush}" StrokeThickness="2.4" />
+                    </Canvas>
+                </Viewbox>
+            </Button>
+
+            <Button x:Name="MoreButton" Content="…" Width="28" Click="MoreButton_Click"
+                    ToolTip="{x:Static res:Strings.FormatMore}">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{x:Static res:Strings.FormatBlockquote}" Click="Blockquote_Click" />
+                        <MenuItem Header="{x:Static res:Strings.FormatCode}" Click="Code_Click" />
+                        <MenuItem Header="{x:Static res:Strings.FormatHorizontalRule}" Click="HorizontalRule_Click" />
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+        </StackPanel>
+    </Border>
+</UserControl>

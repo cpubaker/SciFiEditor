@@ -1,15 +1,19 @@
-using ICSharpCode.AvalonEdit;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace SciFiEditor.App.Editor;
 
-// Best-effort vertical centering: assumes one visual line per document line, so it drifts on
-// wrapped paragraphs. AvalonEdit doesn't expose cheap pixel-accurate wrapped-line geometry.
+// Keeps the caret vertically centered while typing (Focus Mode). Uses the caret's real
+// pixel rect via TextPointer.GetCharacterRect, which -- unlike the previous AvalonEdit
+// version -- correctly accounts for wrapped paragraphs instead of assuming one visual
+// line per document line.
 public sealed class TypewriterScrollController
 {
-    private readonly TextEditor _editor;
+    private readonly RichTextBox _editor;
     private bool _isActive;
 
-    public TypewriterScrollController(TextEditor editor)
+    public TypewriterScrollController(RichTextBox editor)
     {
         _editor = editor;
     }
@@ -22,7 +26,7 @@ public sealed class TypewriterScrollController
         }
 
         _isActive = true;
-        _editor.TextArea.Caret.PositionChanged += OnCaretPositionChanged;
+        _editor.SelectionChanged += OnSelectionChanged;
     }
 
     public void Detach()
@@ -33,16 +37,13 @@ public sealed class TypewriterScrollController
         }
 
         _isActive = false;
-        _editor.TextArea.Caret.PositionChanged -= OnCaretPositionChanged;
+        _editor.SelectionChanged -= OnSelectionChanged;
     }
 
-    private void OnCaretPositionChanged(object? sender, EventArgs e)
+    private void OnSelectionChanged(object? sender, RoutedEventArgs e)
     {
-        var textView = _editor.TextArea.TextView;
-        var caretLine = _editor.Document.GetLineByOffset(_editor.CaretOffset).LineNumber;
-        var lineHeight = textView.DefaultLineHeight;
-        var visualTop = (caretLine - 1) * lineHeight;
-        var target = visualTop - (_editor.ViewportHeight / 2) + (lineHeight / 2);
+        var caretRect = _editor.CaretPosition.GetCharacterRect(LogicalDirection.Forward);
+        var target = _editor.VerticalOffset + caretRect.Top - (_editor.ActualHeight / 2) + (caretRect.Height / 2);
         _editor.ScrollToVerticalOffset(Math.Max(0, target));
     }
 }

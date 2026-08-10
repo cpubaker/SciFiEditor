@@ -102,6 +102,20 @@ public static class Strings
     public static string StartupContinueWithoutProject => Get("StartupContinueWithoutProject");
     public static string StartupRecentProjectsLabel => Get("StartupRecentProjectsLabel");
     public static string StartupNoRecentProjects => Get("StartupNoRecentProjects");
+    public static string FormatHeadingNormal => Get("FormatHeadingNormal");
+    public static string FormatBulletList => Get("FormatBulletList");
+    public static string FormatNumberedList => Get("FormatNumberedList");
+    public static string FormatBold => Get("FormatBold");
+    public static string FormatItalic => Get("FormatItalic");
+    public static string FormatStrikethrough => Get("FormatStrikethrough");
+    public static string FormatLink => Get("FormatLink");
+    public static string FormatMore => Get("FormatMore");
+    public static string FormatBlockquote => Get("FormatBlockquote");
+    public static string FormatCode => Get("FormatCode");
+    public static string FormatHorizontalRule => Get("FormatHorizontalRule");
+    public static string DialogLinkUrl => Get("DialogLinkUrl");
+    public static string DialogLinkText => Get("DialogLinkText");
+    public static string DialogInsertLinkTitle => Get("DialogInsertLinkTitle");
 
     private static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? name;

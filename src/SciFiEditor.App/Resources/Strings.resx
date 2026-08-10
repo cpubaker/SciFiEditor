@@ -339,4 +339,46 @@
   <data name="StartupNoRecentProjects" xml:space="preserve">
     <value>Немає останніх проєктів</value>
   </data>
+  <data name="FormatHeadingNormal" xml:space="preserve">
+    <value>Текст</value>
+  </data>
+  <data name="FormatBulletList" xml:space="preserve">
+    <value>Маркований список</value>
+  </data>
+  <data name="FormatNumberedList" xml:space="preserve">
+    <value>Нумерований список</value>
+  </data>
+  <data name="FormatBold" xml:space="preserve">
+    <value>Жирний</value>
+  </data>
+  <data name="FormatItalic" xml:space="preserve">
+    <value>Курсив</value>
+  </data>
+  <data name="FormatStrikethrough" xml:space="preserve">
+    <value>Закреслений</value>
+  </data>
+  <data name="FormatLink" xml:space="preserve">
+    <value>Посилання</value>
+  </data>
+  <data name="FormatMore" xml:space="preserve">
+    <value>Більше</value>
+  </data>
+  <data name="FormatBlockquote" xml:space="preserve">
+    <value>Цитата</value>
+  </data>
+  <data name="FormatCode" xml:space="preserve">
+    <value>Код</value>
+  </data>
+  <data name="FormatHorizontalRule" xml:space="preserve">
+    <value>Горизонтальна лінія</value>
+  </data>
+  <data name="DialogLinkUrl" xml:space="preserve">
+    <value>URL-адреса</value>
+  </data>
+  <data name="DialogLinkText" xml:space="preserve">
+    <value>Текст посилання</value>
+  </data>
+  <data name="DialogInsertLinkTitle" xml:space="preserve">
+    <value>Вставити посилання</value>
+  </data>
 </root>

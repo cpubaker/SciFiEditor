@@ -434,7 +434,16 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             await _fileService.WriteSceneAsync(_projectService.Current!.RootPath, scene.Id, Strings.SeedSceneContent);
 
             var vm = new BinderNodeViewModel(scene, OnRenameCommitted, OnInspectorCommitted);
-            RootNodes.Add(vm);
+            var trashIndex = RootNodes.ToList().FindIndex(n => n.IsTrashNode);
+            if (trashIndex >= 0)
+            {
+                RootNodes.Insert(trashIndex, vm);
+            }
+            else
+            {
+                RootNodes.Add(vm);
+            }
+
             vm.IsSelected = true;
             await OnBinderSelectionChangedAsync(vm);
         }
@@ -546,7 +555,16 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             var created = _nodeService.AddNode(nodeType, defaultTitle, parent?.Id);
             var vm = new BinderNodeViewModel(created, OnRenameCommitted, OnInspectorCommitted);
             var collection = parent?.Children ?? RootNodes;
-            collection.Add(vm);
+            var trashIndex = parent is null ? collection.ToList().FindIndex(n => n.IsTrashNode) : -1;
+            if (trashIndex >= 0)
+            {
+                collection.Insert(trashIndex, vm);
+            }
+            else
+            {
+                collection.Add(vm);
+            }
+
             vm.BeginRename();
             _ = IndexNodeSafeAsync(created.Id);
         }
@@ -608,7 +626,9 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             return vm;
         }
 
-        foreach (var root in childrenByParent[null].OrderBy(n => n.SortOrder))
+        foreach (var root in childrenByParent[null]
+                     .OrderBy(n => n.Id == WellKnownNodeIds.Trash ? 1 : 0)
+                     .ThenBy(n => n.SortOrder))
         {
             RootNodes.Add(Build(root));
         }
