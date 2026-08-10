@@ -10,7 +10,7 @@ public static class MarkdownPreviewService
 
     public static string ToHtml(string? markdown)
     {
-        var body = Markdig.Markdown.ToHtml(markdown ?? string.Empty);
+        var body = Markdig.Markdown.ToHtml(markdown ?? string.Empty, MarkdownPipelineFactory.Create());
         return HtmlHead + body + "</body></html>";
     }
 }

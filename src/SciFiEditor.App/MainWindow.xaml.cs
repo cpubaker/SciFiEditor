@@ -12,7 +12,7 @@ public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
     private readonly TypewriterScrollController _typewriterScroll;
-    private readonly ParagraphDimmingTransformer _dimmingTransformer = new();
+    private readonly FocusModeDimmer _focusModeDimmer;
     private bool _isFocusModeActive;
 
     public MainWindow(MainViewModel viewModel)
@@ -25,7 +25,9 @@ public partial class MainWindow : Window
         Closing += MainWindow_Closing;
 
         FindReplaceBarControl.Attach(SceneEditor);
+        FormattingToolbarControl.Attach(SceneEditor);
         _typewriterScroll = new TypewriterScrollController(SceneEditor);
+        _focusModeDimmer = new FocusModeDimmer(SceneEditor);
         _viewModel.PropertyChanged += ViewModel_PropertyChanged;
     }
 
@@ -75,27 +77,14 @@ public partial class MainWindow : Window
         {
             _isFocusModeActive = true;
             _typewriterScroll.Attach();
-            SceneEditor.TextArea.TextView.LineTransformers.Add(_dimmingTransformer);
-            SceneEditor.TextArea.Caret.PositionChanged += OnFocusModeCaretPositionChanged;
-            UpdateParagraphDimming();
+            _focusModeDimmer.Attach();
         }
         else if (!_viewModel.IsFocusMode && _isFocusModeActive)
         {
             _isFocusModeActive = false;
             _typewriterScroll.Detach();
-            SceneEditor.TextArea.TextView.LineTransformers.Remove(_dimmingTransformer);
-            SceneEditor.TextArea.Caret.PositionChanged -= OnFocusModeCaretPositionChanged;
-            SceneEditor.TextArea.TextView.Redraw();
+            _focusModeDimmer.Detach();
         }
-    }
-
-    private void OnFocusModeCaretPositionChanged(object? sender, EventArgs e) => UpdateParagraphDimming();
-
-    private void UpdateParagraphDimming()
-    {
-        var caretLine = SceneEditor.Document.GetLineByOffset(SceneEditor.CaretOffset).LineNumber;
-        _dimmingTransformer.UpdateCurrentParagraph(SceneEditor.Document, caretLine);
-        SceneEditor.TextArea.TextView.Redraw();
     }
 
     private async void BinderTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

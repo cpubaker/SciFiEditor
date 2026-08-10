@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <SolidColorBrush x:Key="AppWindowBackgroundBrush" Color="#F3E9D8" />
     <SolidColorBrush x:Key="AppWindowForegroundBrush" Color="#2A1F16" />
-    <SolidColorBrush x:Key="AppPanelBackgroundBrush" Color="#EADFC8" />
+    <SolidColorBrush x:Key="AppPanelBackgroundBrush" Color="#C9AD73" />
     <SolidColorBrush x:Key="AppBorderBrush" Color="#C9B896" />
     <SolidColorBrush x:Key="AppAccentBrush" Color="#8B5A2B" />
 </ResourceDictionary>
