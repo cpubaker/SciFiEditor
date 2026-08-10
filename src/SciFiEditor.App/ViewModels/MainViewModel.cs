@@ -417,7 +417,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     }
 
     [RelayCommand]
-    private void NewProject()
+    private async Task NewProject()
     {
         var dialog = new NewProjectWindow { Owner = Application.Current.MainWindow };
         if (dialog.ShowDialog() != true)
@@ -429,6 +429,14 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         {
             _projectService.CreateProject(dialog.ProjectLocation, dialog.ProjectName);
             LoadTree(resetSessionBaseline: true);
+
+            var scene = _nodeService.AddNode(NodeType.Scene, Strings.BinderNewSceneTitle, null);
+            await _fileService.WriteSceneAsync(_projectService.Current!.RootPath, scene.Id, Strings.SeedSceneContent);
+
+            var vm = new BinderNodeViewModel(scene, OnRenameCommitted, OnInspectorCommitted);
+            RootNodes.Add(vm);
+            vm.IsSelected = true;
+            await OnBinderSelectionChangedAsync(vm);
         }
         catch (Exception ex)
         {
@@ -611,9 +619,14 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         _statsService.RecordSnapshot();
         _ = EnsureSearchIndexPopulatedAsync();
 
-        if (selectedId is Guid id)
+        if (selectedId is Guid id && FindNode(RootNodes, id) is { } restored)
         {
-            SelectedNode = FindNode(RootNodes, id);
+            restored.IsSelected = true;
+            _ = OnBinderSelectionChangedAsync(restored);
+        }
+        else
+        {
+            _ = OnBinderSelectionChangedAsync(null);
         }
     }
 

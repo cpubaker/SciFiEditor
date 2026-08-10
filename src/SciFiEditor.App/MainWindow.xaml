@@ -14,6 +14,7 @@
         xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
         Title="SciFiEditor" Height="720" Width="1280"
+        Icon="Assets/app.ico"
         WindowStartupLocation="CenterScreen"
         PreviewKeyDown="MainWindow_PreviewKeyDown"
         Background="{DynamicResource AppWindowBackgroundBrush}"
@@ -42,13 +43,36 @@
                 <Separator />
                 <MenuItem Header="{x:Static res:Strings.MenuSave}" Command="{Binding SaveCommand}" />
             </MenuItem>
-            <MenuItem Header="{x:Static res:Strings.MenuEdit}" />
+            <MenuItem Header="{x:Static res:Strings.MenuEdit}">
+                <MenuItem Header="{x:Static res:Strings.MenuUndo}" Command="ApplicationCommands.Undo"
+                          CommandTarget="{Binding ElementName=SceneEditor}" InputGestureText="Ctrl+Z" />
+                <MenuItem Header="{x:Static res:Strings.MenuRedo}" Command="ApplicationCommands.Redo"
+                          CommandTarget="{Binding ElementName=SceneEditor}" InputGestureText="Ctrl+Y" />
+                <Separator />
+                <MenuItem Header="{x:Static res:Strings.MenuCut}" Command="ApplicationCommands.Cut"
+                          CommandTarget="{Binding ElementName=SceneEditor}" InputGestureText="Ctrl+X" />
+                <MenuItem Header="{x:Static res:Strings.MenuCopy}" Command="ApplicationCommands.Copy"
+                          CommandTarget="{Binding ElementName=SceneEditor}" InputGestureText="Ctrl+C" />
+                <MenuItem Header="{x:Static res:Strings.MenuPaste}" Command="ApplicationCommands.Paste"
+                          CommandTarget="{Binding ElementName=SceneEditor}" InputGestureText="Ctrl+V" />
+                <MenuItem Header="{x:Static res:Strings.MenuSelectAll}" Command="ApplicationCommands.SelectAll"
+                          CommandTarget="{Binding ElementName=SceneEditor}" InputGestureText="Ctrl+A" />
+                <Separator />
+                <MenuItem Header="{x:Static res:Strings.MenuFind}" Click="FindMenuItem_Click" InputGestureText="Ctrl+F" />
+            </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuView}">
                 <MenuItem Header="{x:Static res:Strings.MenuFocusMode}" IsCheckable="True"
                           IsChecked="{Binding IsFocusMode, Mode=TwoWay}" />
                 <MenuItem Header="{x:Static res:Strings.MenuToggleTheme}" Command="{Binding ToggleThemeCommand}" />
             </MenuItem>
             <MenuItem Header="{x:Static res:Strings.MenuProject}">
+                <MenuItem Header="{x:Static res:Strings.BinderAddFolder}" Command="{Binding AddFolderCommand}"
+                          IsEnabled="{Binding IsProjectOpen}" />
+                <MenuItem Header="{x:Static res:Strings.BinderAddChapter}" Command="{Binding AddChapterCommand}"
+                          InputGestureText="Ctrl+Shift+N" IsEnabled="{Binding IsProjectOpen}" />
+                <MenuItem Header="{x:Static res:Strings.BinderAddScene}" Command="{Binding AddSceneCommand}"
+                          InputGestureText="Ctrl+N" IsEnabled="{Binding IsProjectOpen}" />
+                <Separator />
                 <MenuItem Header="{x:Static res:Strings.MenuStatistics}" Command="{Binding OpenStatsCommand}"
                           IsEnabled="{Binding IsProjectOpen}" />
                 <MenuItem Header="{x:Static res:Strings.MenuCompile}" Command="{Binding OpenCompileCommand}"
@@ -256,9 +280,15 @@
 
                         <TextBlock Text="{x:Static res:Strings.InspectorStatus}" Margin="0,12,0,4" />
                         <ComboBox ItemsSource="{Binding DataContext.StatusOptions, ElementName=RootWindow}"
-                                  DisplayMemberPath="DisplayName" SelectedValuePath="Value"
+                                  SelectedValuePath="Value"
                                   SelectedValue="{Binding Status}"
-                                  SelectionChanged="InspectorField_SelectionChanged" />
+                                  SelectionChanged="InspectorField_SelectionChanged">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
                         <TextBlock Text="{x:Static res:Strings.InspectorLabel}" Margin="0,12,0,4" />
                         <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"
