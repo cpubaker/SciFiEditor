@@ -485,7 +485,20 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     private void AddScene(BinderNodeViewModel? parent) => AddNode(NodeType.Scene, parent);
 
     [RelayCommand]
-    private void Rename(BinderNodeViewModel? node) => node?.BeginRename();
+    private void Rename(BinderNodeViewModel? node)
+    {
+        if (node is null)
+        {
+            return;
+        }
+
+        // Closing the context menu restores focus to the tree item after this command
+        // runs, which would immediately steal focus back from the rename TextBox.
+        // Deferring until the menu has finished closing lets the TextBox keep focus.
+        Application.Current.Dispatcher.BeginInvoke(
+            new Action(node.BeginRename),
+            DispatcherPriority.ContextIdle);
+    }
 
     [RelayCommand]
     private void Duplicate(BinderNodeViewModel? node)
