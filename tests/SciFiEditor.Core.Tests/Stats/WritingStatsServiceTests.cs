@@ -13,6 +13,7 @@ public class WritingStatsServiceTests : IDisposable
     private readonly ProjectService _projectService;
     private readonly NodeService _nodeService;
     private readonly GlobalActivityDatabase _globalActivityDatabase;
+    private readonly GlobalStatsService _globalStatsService;
     private readonly WritingStatsService _statsService;
 
     public WritingStatsServiceTests()
@@ -22,8 +23,8 @@ public class WritingStatsServiceTests : IDisposable
         var fileService = new ManuscriptFileService();
         _nodeService = new NodeService(_projectService, fileService);
         _globalActivityDatabase = new GlobalActivityDatabase(Path.Combine(_temp.Path, "global-activity.db"));
-        var globalStatsService = new GlobalStatsService(new GlobalActivityRepository(_globalActivityDatabase));
-        _statsService = new WritingStatsService(_projectService, _nodeService, globalStatsService);
+        _globalStatsService = new GlobalStatsService(new GlobalActivityRepository(_globalActivityDatabase));
+        _statsService = new WritingStatsService(_projectService, _nodeService, _globalStatsService);
 
         _projectService.CreateProject(_temp.Path, "StatsNovel");
     }
@@ -62,6 +63,18 @@ public class WritingStatsServiceTests : IDisposable
         var stat = _projectService.Current!.Stats.GetByDate(Today)!;
         stat.WordCountTotal.Should().Be(1300);
         stat.WordsWritten.Should().Be(300);
+    }
+
+    [Fact]
+    public void RecordSnapshot_MirrorsWordsWrittenIntoGlobalStatsService()
+    {
+        var scene = _nodeService.AddNode(NodeType.Scene, "Scene", null);
+        _nodeService.UpdateWordCounts(scene.Id, 400, 2000);
+
+        _statsService.RecordSnapshot();
+
+        _globalStatsService.GetHeatmapData().Should().Contain(s => s.Date == Today && s.WordsWritten == 400);
+        _globalStatsService.GetTotalDaysWritten().Should().Be(1);
     }
 
     [Fact]
