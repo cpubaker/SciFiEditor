@@ -11,11 +11,13 @@ public sealed class WritingStatsService
 
     private readonly ProjectService _projectService;
     private readonly NodeService _nodeService;
+    private readonly GlobalStatsService _globalStatsService;
 
-    public WritingStatsService(ProjectService projectService, NodeService nodeService)
+    public WritingStatsService(ProjectService projectService, NodeService nodeService, GlobalStatsService globalStatsService)
     {
         _projectService = projectService;
         _nodeService = nodeService;
+        _globalStatsService = globalStatsService;
     }
 
     private OpenProject Project =>
@@ -28,6 +30,7 @@ public sealed class WritingStatsService
         var baseline = Project.Stats.GetMostRecentBefore(today)?.WordCountTotal ?? 0;
         var wordsWritten = currentTotal - baseline;
         Project.Stats.UpsertDailyStat(today, currentTotal, wordsWritten);
+        _globalStatsService.RecordProjectDay(Project.RootPath, today, wordsWritten);
     }
 
     public IReadOnlyList<DailyStat> GetHeatmapData()

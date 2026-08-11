@@ -20,6 +20,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ProjectService>();
         services.AddSingleton<ManuscriptFileService>();
         services.AddSingleton<NodeService>();
+        services.AddSingleton<GlobalActivityDatabase>();
+        services.AddSingleton<GlobalActivityRepository>();
+        services.AddSingleton<GlobalStatsService>();
         services.AddSingleton<WritingStatsService>();
         services.AddSingleton<CompileService>();
         services.AddSingleton<ExportService>();

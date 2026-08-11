@@ -12,6 +12,7 @@ public class WritingStatsServiceTests : IDisposable
     private readonly TempDirectory _temp = new();
     private readonly ProjectService _projectService;
     private readonly NodeService _nodeService;
+    private readonly GlobalActivityDatabase _globalActivityDatabase;
     private readonly WritingStatsService _statsService;
 
     public WritingStatsServiceTests()
@@ -20,7 +21,9 @@ public class WritingStatsServiceTests : IDisposable
         _projectService = new ProjectService(recentProjects, new ProjectBackupService());
         var fileService = new ManuscriptFileService();
         _nodeService = new NodeService(_projectService, fileService);
-        _statsService = new WritingStatsService(_projectService, _nodeService);
+        _globalActivityDatabase = new GlobalActivityDatabase(Path.Combine(_temp.Path, "global-activity.db"));
+        var globalStatsService = new GlobalStatsService(new GlobalActivityRepository(_globalActivityDatabase));
+        _statsService = new WritingStatsService(_projectService, _nodeService, globalStatsService);
 
         _projectService.CreateProject(_temp.Path, "StatsNovel");
     }
@@ -28,6 +31,7 @@ public class WritingStatsServiceTests : IDisposable
     public void Dispose()
     {
         _projectService.Current?.Dispose();
+        _globalActivityDatabase.Dispose();
         _temp.Dispose();
     }
 

@@ -1,6 +1,8 @@
 using System.Windows;
 using System.Windows.Controls;
+using SciFiEditor.App.Resources;
 using SciFiEditor.App.ViewModels;
+using SciFiEditor.Core.Stats;
 using SciFiEditor.Domain;
 
 namespace SciFiEditor.App.Views;
@@ -8,16 +10,28 @@ namespace SciFiEditor.App.Views;
 public partial class StartupWindow : Window
 {
     private readonly MainViewModel _viewModel;
+    private readonly GlobalStatsService _globalStatsService;
 
-    public StartupWindow(MainViewModel viewModel)
+    public StartupWindow(MainViewModel viewModel, GlobalStatsService globalStatsService)
     {
         InitializeComponent();
         _viewModel = viewModel;
+        _globalStatsService = globalStatsService;
 
         RecentProjectsList.ItemsSource = _viewModel.RecentProjects;
         NoRecentProjectsText.Visibility = _viewModel.RecentProjects.Count == 0
             ? Visibility.Visible
             : Visibility.Collapsed;
+
+        LoadActivity();
+    }
+
+    private void LoadActivity()
+    {
+        ActivityHeatmap.Data = _globalStatsService.GetHeatmapData();
+        StreakText.Text = string.Format(Strings.StartupStreakLabel, _globalStatsService.GetStreak());
+        TotalDaysText.Text = string.Format(Strings.StartupTotalDaysLabel, _globalStatsService.GetTotalDaysWritten());
+        HeatmapScrollViewer.ScrollToRightEnd();
     }
 
     private async void NewProjectButton_Click(object sender, RoutedEventArgs e)
