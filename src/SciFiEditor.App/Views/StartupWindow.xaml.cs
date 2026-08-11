@@ -35,7 +35,14 @@ public partial class StartupWindow : Window
 
         // Deferred: the ScrollViewer hasn't measured/arranged the heatmap yet at construction time,
         // so ScrollableWidth is still 0 here. Run after layout completes instead.
-        Dispatcher.BeginInvoke(() => HeatmapScrollViewer.ScrollToRightEnd(), DispatcherPriority.Loaded);
+        Dispatcher.BeginInvoke(() =>
+        {
+            // ScrollToRightEnd() lands at an arbitrary pixel offset, slicing the leftmost visible
+            // week-column mid-cell. Snap down to the nearest column boundary so it renders whole.
+            var snappedOffset = Math.Floor(HeatmapScrollViewer.ScrollableWidth / Controls.CalendarHeatmapControl.ColumnWidth)
+                * Controls.CalendarHeatmapControl.ColumnWidth;
+            HeatmapScrollViewer.ScrollToHorizontalOffset(snappedOffset);
+        }, DispatcherPriority.Loaded);
     }
 
     private async void NewProjectButton_Click(object sender, RoutedEventArgs e)

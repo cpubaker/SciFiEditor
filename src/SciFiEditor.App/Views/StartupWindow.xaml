@@ -41,7 +41,7 @@
 
             <StackPanel x:Name="ActivityPanel" Grid.Row="2">
                 <ScrollViewer x:Name="HeatmapScrollViewer" HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Disabled" Height="100">
+                              VerticalScrollBarVisibility="Disabled">
                     <controls:CalendarHeatmapControl x:Name="ActivityHeatmap" />
                 </ScrollViewer>
                 <TextBlock x:Name="StreakText" Margin="0,8,0,0" Opacity="0.85" />

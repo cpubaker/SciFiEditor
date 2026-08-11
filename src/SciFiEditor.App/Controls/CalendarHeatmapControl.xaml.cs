@@ -7,6 +7,9 @@ namespace SciFiEditor.App.Controls;
 
 public partial class CalendarHeatmapControl : System.Windows.Controls.UserControl
 {
+    /// <summary>Rendered width of one week-column: cell Width (12) plus its 1px margin on each side.</summary>
+    public const double ColumnWidth = 14;
+
     private static readonly Brush EmptyBrush = FreezeBrush(Color.FromRgb(0xB8, 0xA7, 0x88));
     private static readonly Brush LowBrush = FreezeBrush(Color.FromRgb(0x9B, 0xE9, 0xA8));
     private static readonly Brush HighBrush = FreezeBrush(Color.FromRgb(0x40, 0xC4, 0x63));
