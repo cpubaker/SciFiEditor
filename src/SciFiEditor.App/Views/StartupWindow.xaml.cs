@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using SciFiEditor.App.Resources;
 using SciFiEditor.App.ViewModels;
 using SciFiEditor.Core.Stats;
@@ -31,7 +32,10 @@ public partial class StartupWindow : Window
         ActivityHeatmap.Data = _globalStatsService.GetHeatmapData();
         StreakText.Text = string.Format(Strings.StartupStreakLabel, _globalStatsService.GetStreak());
         TotalDaysText.Text = string.Format(Strings.StartupTotalDaysLabel, _globalStatsService.GetTotalDaysWritten());
-        HeatmapScrollViewer.ScrollToRightEnd();
+
+        // Deferred: the ScrollViewer hasn't measured/arranged the heatmap yet at construction time,
+        // so ScrollableWidth is still 0 here. Run after layout completes instead.
+        Dispatcher.BeginInvoke(() => HeatmapScrollViewer.ScrollToRightEnd(), DispatcherPriority.Loaded);
     }
 
     private async void NewProjectButton_Click(object sender, RoutedEventArgs e)
