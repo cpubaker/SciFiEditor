@@ -10,7 +10,7 @@
         <ItemsControl.ItemTemplate>
             <DataTemplate>
                 <Border Width="10" Height="{Binding Height}" Margin="1,0"
-                        VerticalAlignment="Bottom" Background="#4078C0"
+                        VerticalAlignment="Bottom" Background="{DynamicResource AppAccentBrush}"
                         ToolTip="{Binding Tooltip}" />
             </DataTemplate>
         </ItemsControl.ItemTemplate>
