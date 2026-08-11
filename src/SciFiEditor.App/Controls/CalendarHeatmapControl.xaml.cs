@@ -20,6 +20,10 @@ public partial class CalendarHeatmapControl : System.Windows.Controls.UserContro
         nameof(DailyGoal), typeof(int?), typeof(CalendarHeatmapControl),
         new PropertyMetadata(null, OnDataOrGoalChanged));
 
+    public static readonly DependencyProperty DaysProperty = DependencyProperty.Register(
+        nameof(Days), typeof(int), typeof(CalendarHeatmapControl),
+        new PropertyMetadata(182, OnDataOrGoalChanged));
+
     public CalendarHeatmapControl()
     {
         InitializeComponent();
@@ -37,21 +41,20 @@ public partial class CalendarHeatmapControl : System.Windows.Controls.UserContro
         set => SetValue(DailyGoalProperty, value);
     }
 
+    public int Days
+    {
+        get => (int)GetValue(DaysProperty);
+        set => SetValue(DaysProperty, value);
+    }
+
     private static void OnDataOrGoalChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         ((CalendarHeatmapControl)d).Rebuild();
 
     private void Rebuild()
     {
-        var data = Data;
-        if (data is null || data.Count == 0)
-        {
-            WeeksItemsControl.ItemsSource = null;
-            return;
-        }
-
-        var byDate = data.ToDictionary(s => s.Date);
-        var firstDate = data.Min(s => s.Date);
-        var lastDate = data.Max(s => s.Date);
+        var byDate = (Data ?? Array.Empty<DailyStat>()).ToDictionary(s => s.Date);
+        var lastDate = DateOnly.FromDateTime(DateTime.Now);
+        var firstDate = lastDate.AddDays(-(Days - 1));
         var gridStart = firstDate.AddDays(-DayOfWeekMondayFirst(firstDate.DayOfWeek));
 
         var weeks = new List<List<HeatmapCell>>();
