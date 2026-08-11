@@ -40,8 +40,11 @@
             </StackPanel>
 
             <StackPanel x:Name="ActivityPanel" Grid.Row="2">
+                <!-- Width must be an exact multiple of CalendarHeatmapControl.ColumnWidth (14px x 15 weeks),
+                     otherwise no scroll offset can align both the left and right edges on a column boundary. -->
                 <ScrollViewer x:Name="HeatmapScrollViewer" HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Disabled">
+                              VerticalScrollBarVisibility="Disabled"
+                              Width="210" HorizontalAlignment="Left">
                     <controls:CalendarHeatmapControl x:Name="ActivityHeatmap" />
                 </ScrollViewer>
                 <TextBlock x:Name="StreakText" Margin="0,8,0,0" Opacity="0.85" />
