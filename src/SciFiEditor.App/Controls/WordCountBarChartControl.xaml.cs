@@ -13,6 +13,10 @@ public partial class WordCountBarChartControl : System.Windows.Controls.UserCont
         nameof(Data), typeof(IReadOnlyList<DailyStat>), typeof(WordCountBarChartControl),
         new PropertyMetadata(null, OnDataChanged));
 
+    public static readonly DependencyProperty DaysProperty = DependencyProperty.Register(
+        nameof(Days), typeof(int), typeof(WordCountBarChartControl),
+        new PropertyMetadata(30, OnDataChanged));
+
     public WordCountBarChartControl()
     {
         InitializeComponent();
@@ -24,24 +28,33 @@ public partial class WordCountBarChartControl : System.Windows.Controls.UserCont
         set => SetValue(DataProperty, value);
     }
 
+    public int Days
+    {
+        get => (int)GetValue(DaysProperty);
+        set => SetValue(DaysProperty, value);
+    }
+
     private static void OnDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         ((WordCountBarChartControl)d).Rebuild();
 
     private void Rebuild()
     {
-        var data = Data;
-        if (data is null || data.Count == 0)
-        {
-            BarsItemsControl.ItemsSource = null;
-            return;
-        }
+        var byDate = (Data ?? Array.Empty<DailyStat>()).ToDictionary(s => s.Date);
+        var max = Math.Max(1, byDate.Values.Select(s => s.WordsWritten).DefaultIfEmpty(0).Max());
+        var lastDate = DateOnly.FromDateTime(DateTime.Now);
+        var firstDate = lastDate.AddDays(-(Days - 1));
 
-        var max = Math.Max(1, data.Max(s => s.WordsWritten));
-        var bars = data
-            .Select(stat => new BarCell(
-                Math.Max(MinBarHeight, stat.WordsWritten <= 0 ? MinBarHeight : (double)stat.WordsWritten / max * MaxBarHeight),
-                $"{stat.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}: {stat.WordsWritten} слів"))
-            .ToList();
+        var bars = new List<BarCell>();
+        for (var date = firstDate; date <= lastDate; date = date.AddDays(1))
+        {
+            var stat = byDate.GetValueOrDefault(date);
+            var wordsWritten = stat?.WordsWritten ?? 0;
+            var height = wordsWritten <= 0 ? MinBarHeight : Math.Max(MinBarHeight, (double)wordsWritten / max * MaxBarHeight);
+            var tooltip = stat is null
+                ? string.Empty
+                : $"{date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}: {wordsWritten} слів";
+            bars.Add(new BarCell(height, tooltip));
+        }
 
         BarsItemsControl.ItemsSource = bars;
     }

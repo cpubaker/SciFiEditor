@@ -2,8 +2,9 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:res="clr-namespace:SciFiEditor.App.Resources"
+        xmlns:controls="clr-namespace:SciFiEditor.App.Controls"
         Title="{x:Static res:Strings.StartupTitle}"
-        Height="420" Width="640"
+        Height="520" Width="640"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Icon="/Assets/app.ico"
@@ -16,20 +17,40 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0">
-            <TextBlock Text="{x:Static res:Strings.StartupTitle}" FontSize="24" FontWeight="Bold" Margin="0,0,0,4" />
-            <TextBlock Text="{x:Static res:Strings.StartupSubtitle}" Opacity="0.7" Margin="0,0,0,20" TextWrapping="Wrap" />
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-            <Button x:Name="NewProjectButton" Content="{x:Static res:Strings.StartupNewProject}"
-                    HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,8"
-                    Click="NewProjectButton_Click" />
-            <Button x:Name="OpenProjectButton" Content="{x:Static res:Strings.StartupOpenProject}"
-                    HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,8"
-                    Click="OpenProjectButton_Click" />
-            <Button x:Name="ContinueButton" Content="{x:Static res:Strings.StartupContinueWithoutProject}"
-                    HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,8"
-                    Click="ContinueButton_Click" />
-        </StackPanel>
+            <StackPanel Grid.Row="0">
+                <TextBlock Text="{x:Static res:Strings.StartupTitle}" FontSize="24" FontWeight="Bold" Margin="0,0,0,4" />
+                <TextBlock Text="{x:Static res:Strings.StartupSubtitle}" Opacity="0.7" Margin="0,0,0,20" TextWrapping="Wrap" />
+
+                <Button x:Name="NewProjectButton" Content="{x:Static res:Strings.StartupNewProject}"
+                        HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,8"
+                        Click="NewProjectButton_Click" />
+                <Button x:Name="OpenProjectButton" Content="{x:Static res:Strings.StartupOpenProject}"
+                        HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,8"
+                        Click="OpenProjectButton_Click" />
+                <Button x:Name="ContinueButton" Content="{x:Static res:Strings.StartupContinueWithoutProject}"
+                        HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,8"
+                        Click="ContinueButton_Click" />
+            </StackPanel>
+
+            <StackPanel x:Name="ActivityPanel" Grid.Row="2">
+                <!-- Width must be an exact multiple of CalendarHeatmapControl.ColumnWidth (14px x 15 weeks),
+                     otherwise no scroll offset can align both the left and right edges on a column boundary. -->
+                <ScrollViewer x:Name="HeatmapScrollViewer" HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Disabled"
+                              Width="210" HorizontalAlignment="Left">
+                    <controls:CalendarHeatmapControl x:Name="ActivityHeatmap" />
+                </ScrollViewer>
+                <TextBlock x:Name="StreakText" Margin="0,8,0,0" Opacity="0.85" />
+                <TextBlock x:Name="TotalDaysText" Margin="0,2,0,0" Opacity="0.85" />
+            </StackPanel>
+        </Grid>
 
         <Border Grid.Column="1" Background="{DynamicResource AppBorderBrush}" Width="1" HorizontalAlignment="Center" />
 

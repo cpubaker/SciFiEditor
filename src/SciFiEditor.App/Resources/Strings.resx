@@ -339,6 +339,12 @@
   <data name="StartupNoRecentProjects" xml:space="preserve">
     <value>Немає останніх проєктів</value>
   </data>
+  <data name="StartupStreakLabel" xml:space="preserve">
+    <value>Днів підряд: {0}</value>
+  </data>
+  <data name="StartupTotalDaysLabel" xml:space="preserve">
+    <value>Загалом: {0}</value>
+  </data>
   <data name="FormatHeadingNormal" xml:space="preserve">
     <value>Текст</value>
   </data>

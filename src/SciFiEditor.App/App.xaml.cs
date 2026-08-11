@@ -8,6 +8,7 @@ using SciFiEditor.App.ViewModels;
 using SciFiEditor.App.Views;
 using SciFiEditor.Core.DependencyInjection;
 using SciFiEditor.Core.Settings;
+using SciFiEditor.Core.Stats;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -55,7 +56,8 @@ public partial class App : Application
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         var mainViewModel = _host.Services.GetRequiredService<MainViewModel>();
-        var startupWindow = new StartupWindow(mainViewModel);
+        var globalStatsService = _host.Services.GetRequiredService<GlobalStatsService>();
+        var startupWindow = new StartupWindow(mainViewModel, globalStatsService);
         startupWindow.ShowDialog();
 
         var mainWindow = _host.Services.GetRequiredService<MainWindow>();

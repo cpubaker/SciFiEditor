@@ -102,6 +102,8 @@ public static class Strings
     public static string StartupContinueWithoutProject => Get("StartupContinueWithoutProject");
     public static string StartupRecentProjectsLabel => Get("StartupRecentProjectsLabel");
     public static string StartupNoRecentProjects => Get("StartupNoRecentProjects");
+    public static string StartupStreakLabel => Get("StartupStreakLabel");
+    public static string StartupTotalDaysLabel => Get("StartupTotalDaysLabel");
     public static string FormatHeadingNormal => Get("FormatHeadingNormal");
     public static string FormatBulletList => Get("FormatBulletList");
     public static string FormatNumberedList => Get("FormatNumberedList");
