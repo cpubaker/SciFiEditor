@@ -20,4 +20,5 @@ public class ManuscriptNode
     public int WordCount { get; set; }
     public int CharCount { get; set; }
     public bool IncludeInCompile { get; set; } = true;
+    public bool IsExpanded { get; set; }
 }

@@ -13,7 +13,7 @@ public sealed class NodeRepository
         created_at_utc AS CreatedAtUtc, updated_at_utc AS UpdatedAtUtc,
         synopsis AS Synopsis, notes AS Notes, label AS Label, status AS Status,
         target_word_count AS TargetWordCount, word_count AS WordCount, char_count AS CharCount,
-        include_in_compile AS IncludeInCompile
+        include_in_compile AS IncludeInCompile, is_expanded AS IsExpanded
         """;
 
     private readonly ProjectDatabase _database;
@@ -41,10 +41,10 @@ public sealed class NodeRepository
         const string sql = """
             INSERT INTO nodes (
                 id, parent_id, node_type, title, sort_order, is_trashed, original_parent_id, created_at_utc, updated_at_utc,
-                synopsis, notes, label, status, target_word_count, word_count, char_count, include_in_compile)
+                synopsis, notes, label, status, target_word_count, word_count, char_count, include_in_compile, is_expanded)
             VALUES (
                 @Id, @ParentId, @NodeType, @Title, @SortOrder, @IsTrashed, @OriginalParentId, @CreatedAtUtc, @UpdatedAtUtc,
-                @Synopsis, @Notes, @Label, @Status, @TargetWordCount, @WordCount, @CharCount, @IncludeInCompile)
+                @Synopsis, @Notes, @Label, @Status, @TargetWordCount, @WordCount, @CharCount, @IncludeInCompile, @IsExpanded)
             """;
         _database.Connection.Execute(sql, ToParameters(node));
     }
@@ -91,6 +91,12 @@ public sealed class NodeRepository
             Include = include ? 1 : 0,
             UpdatedAtUtc = Format(updatedAtUtc)
         });
+    }
+
+    public void UpdateExpanded(Guid id, bool isExpanded)
+    {
+        const string sql = "UPDATE nodes SET is_expanded = @IsExpanded WHERE id = @Id";
+        _database.Connection.Execute(sql, new { Id = id.ToString(), IsExpanded = isExpanded ? 1 : 0 });
     }
 
     public int GetProjectWordCount()
@@ -163,7 +169,8 @@ public sealed class NodeRepository
         node.TargetWordCount,
         node.WordCount,
         node.CharCount,
-        IncludeInCompile = node.IncludeInCompile ? 1 : 0
+        IncludeInCompile = node.IncludeInCompile ? 1 : 0,
+        IsExpanded = node.IsExpanded ? 1 : 0
     };
 
     private static string Format(DateTime value) => value.ToString("o", CultureInfo.InvariantCulture);
@@ -186,7 +193,8 @@ public sealed class NodeRepository
         TargetWordCount = row.TargetWordCount is null ? null : (int)row.TargetWordCount.Value,
         WordCount = (int)row.WordCount,
         CharCount = (int)row.CharCount,
-        IncludeInCompile = row.IncludeInCompile != 0
+        IncludeInCompile = row.IncludeInCompile != 0,
+        IsExpanded = row.IsExpanded != 0
     };
 
     private sealed class NodeRow
@@ -208,5 +216,6 @@ public sealed class NodeRepository
         public long WordCount { get; set; }
         public long CharCount { get; set; }
         public long IncludeInCompile { get; set; }
+        public long IsExpanded { get; set; }
     }
 }

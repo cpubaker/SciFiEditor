@@ -107,7 +107,22 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     public ObservableCollection<BinderNodeViewModel> CorkboardNodes =>
         SelectedNode?.Children.Count > 0 ? SelectedNode.Children : RootNodes;
 
-    partial void OnSelectedNodeChanged(BinderNodeViewModel? value) => OnPropertyChanged(nameof(CorkboardNodes));
+    public bool IsContainerNodeSelected => SelectedNode is not null && SelectedNode.NodeType != NodeType.Scene;
+
+    partial void OnSelectedNodeChanged(BinderNodeViewModel? value)
+    {
+        OnPropertyChanged(nameof(CorkboardNodes));
+        OnPropertyChanged(nameof(IsContainerNodeSelected));
+    }
+
+    [RelayCommand]
+    private void SelectChild(BinderNodeViewModel? node)
+    {
+        if (node is not null)
+        {
+            NavigateToNode(node.Id);
+        }
+    }
 
     [ObservableProperty]
     private string _statusText = Strings.StatusReady;
@@ -439,8 +454,8 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             var scene = _nodeService.AddNode(NodeType.Scene, Strings.BinderNewSceneTitle, chapter.Id);
             await _fileService.WriteSceneAsync(_projectService.Current!.RootPath, scene.Id, Strings.SeedSceneContent);
 
-            var chapterVm = new BinderNodeViewModel(chapter, OnRenameCommitted, OnInspectorCommitted) { IsExpanded = true };
-            var sceneVm = new BinderNodeViewModel(scene, OnRenameCommitted, OnInspectorCommitted);
+            var chapterVm = new BinderNodeViewModel(chapter, OnRenameCommitted, OnInspectorCommitted, OnExpandedChanged) { IsExpanded = true };
+            var sceneVm = new BinderNodeViewModel(scene, OnRenameCommitted, OnInspectorCommitted, OnExpandedChanged);
             chapterVm.Children.Add(sceneVm);
 
             var trashIndex = RootNodes.ToList().FindIndex(n => n.IsTrashNode);
@@ -485,13 +500,18 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
     }
 
     [RelayCommand]
-    private void AddFolder(BinderNodeViewModel? parent) => AddNode(NodeType.Folder, parent);
+    private void AddFolder(BinderNodeViewModel? parent) => AddNode(NodeType.Folder, parent ?? DefaultAddParent());
 
     [RelayCommand]
-    private void AddChapter(BinderNodeViewModel? parent) => AddNode(NodeType.Chapter, parent);
+    private void AddChapter(BinderNodeViewModel? parent) => AddNode(NodeType.Chapter, parent ?? DefaultAddParent());
 
     [RelayCommand]
-    private void AddScene(BinderNodeViewModel? parent) => AddNode(NodeType.Scene, parent);
+    private void AddScene(BinderNodeViewModel? parent) => AddNode(NodeType.Scene, parent ?? DefaultAddParent());
+
+    // The "Проект" menu and the binder's empty-area context menu invoke these commands with no
+    // explicit target, so without this they always add to the root regardless of what's selected.
+    private BinderNodeViewModel? DefaultAddParent() =>
+        SelectedNode is { IsTrashNode: false } selected ? selected : null;
 
     [RelayCommand]
     private void Rename(BinderNodeViewModel? node)
@@ -575,7 +595,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             };
 
             var created = _nodeService.AddNode(nodeType, defaultTitle, parent?.Id);
-            var vm = new BinderNodeViewModel(created, OnRenameCommitted, OnInspectorCommitted);
+            var vm = new BinderNodeViewModel(created, OnRenameCommitted, OnInspectorCommitted, OnExpandedChanged);
             var collection = parent?.Children ?? RootNodes;
             var trashIndex = parent is null ? collection.ToList().FindIndex(n => n.IsTrashNode) : -1;
             if (trashIndex >= 0)
@@ -627,7 +647,6 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
     private void LoadTree(bool resetSessionBaseline = false)
     {
-        var expandedIds = CollectExpandedIds(RootNodes);
         var selectedId = SelectedNode?.Id;
 
         RootNodes.Clear();
@@ -636,10 +655,7 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
 
         BinderNodeViewModel Build(ManuscriptNode node)
         {
-            var vm = new BinderNodeViewModel(node, OnRenameCommitted, OnInspectorCommitted)
-            {
-                IsExpanded = expandedIds.Contains(node.Id)
-            };
+            var vm = new BinderNodeViewModel(node, OnRenameCommitted, OnInspectorCommitted, OnExpandedChanged);
             foreach (var child in childrenByParent[node.Id].OrderBy(n => n.SortOrder))
             {
                 vm.Children.Add(Build(child));
@@ -699,25 +715,16 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         }
     }
 
-    private static HashSet<Guid> CollectExpandedIds(IEnumerable<BinderNodeViewModel> nodes)
+    private void OnExpandedChanged(BinderNodeViewModel node)
     {
-        var result = new HashSet<Guid>();
-
-        void Walk(IEnumerable<BinderNodeViewModel> items)
+        try
         {
-            foreach (var item in items)
-            {
-                if (item.IsExpanded)
-                {
-                    result.Add(item.Id);
-                }
-
-                Walk(item.Children);
-            }
+            _nodeService.SetExpanded(node.Id, node.IsExpanded);
         }
-
-        Walk(nodes);
-        return result;
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to persist expanded state for node {Id}", node.Id);
+        }
     }
 
     private static List<BinderNodeViewModel>? FindPath(IEnumerable<BinderNodeViewModel> nodes, Guid id)
