@@ -172,7 +172,7 @@
                         </ContextMenu>
                     </TreeView.Resources>
                     <TreeView.ItemContainerStyle>
-                        <Style TargetType="TreeViewItem">
+                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                             <Setter Property="ContextMenu" Value="{StaticResource BinderNodeContextMenu}" />
                             <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=TreeView}}" />
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -210,7 +210,7 @@
                                                   Stroke="{DynamicResource AppWindowForegroundBrush}" StrokeThickness="1.2" />
                                         </Canvas>
                                     </Viewbox>
-                                    <TextBlock Text="{Binding Title}" Foreground="{DynamicResource AppWindowForegroundBrush}" />
+                                    <TextBlock Text="{Binding Title}" />
                                 </StackPanel>
                                 <TextBox Text="{Binding EditTitle, UpdateSourceTrigger=PropertyChanged}"
                                          Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
