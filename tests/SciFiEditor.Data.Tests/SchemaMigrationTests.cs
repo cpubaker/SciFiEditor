@@ -114,6 +114,44 @@ public class SchemaMigrationTests
     }
 
     [Fact]
+    public void EnsureSchema_AddsLastSelectedNodeIdColumn_ToAnM4ShapedProjectSettingsTable_WithoutDataLoss()
+    {
+        using var temp = new TempDirectory();
+        var dbPath = Path.Combine(temp.Path, ProjectDatabase.DatabaseFileName);
+
+        // Simulate a project.db created before the last_selected_node_id column existed on project_settings.
+        using (var connection = new SqliteConnection($"Data Source={dbPath};Pooling=False"))
+        {
+            connection.Open();
+            using var create = connection.CreateCommand();
+            create.CommandText = """
+                CREATE TABLE project_settings (
+                    id INTEGER PRIMARY KEY CHECK (id = 1),
+                    daily_goal INTEGER NULL,
+                    session_goal INTEGER NULL
+                );
+                """;
+            create.ExecuteNonQuery();
+
+            using var insert = connection.CreateCommand();
+            insert.CommandText = "INSERT INTO project_settings (id, daily_goal, session_goal) VALUES (1, 500, 250);";
+            insert.ExecuteNonQuery();
+        }
+
+        using var database = new ProjectDatabase(temp.Path);
+        var repository = new StatsRepository(database);
+
+        var goals = repository.GetGoals();
+        goals.DailyGoal.Should().Be(500);
+        goals.SessionGoal.Should().Be(250);
+        repository.GetLastSelectedNodeId().Should().BeNull();
+
+        var nodeId = Guid.NewGuid();
+        repository.SetLastSelectedNodeId(nodeId);
+        repository.GetLastSelectedNodeId().Should().Be(nodeId);
+    }
+
+    [Fact]
     public void EnsureSchema_IsIdempotent_WhenColumnsAlreadyMigrated()
     {
         using var temp = new TempDirectory();

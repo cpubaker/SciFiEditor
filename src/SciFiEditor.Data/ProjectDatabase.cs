@@ -18,6 +18,11 @@ public sealed class ProjectDatabase : IDisposable
         ("include_in_compile", "INTEGER NOT NULL DEFAULT 1")
     ];
 
+    private static readonly (string Name, string Definition)[] MigratedProjectSettingsColumns =
+    [
+        ("last_selected_node_id", "TEXT NULL")
+    ];
+
     public ProjectDatabase(string projectRootPath)
     {
         var dbPath = Path.Combine(projectRootPath, DatabaseFileName);
@@ -70,7 +75,8 @@ public sealed class ProjectDatabase : IDisposable
                 CREATE TABLE IF NOT EXISTS project_settings (
                     id INTEGER PRIMARY KEY CHECK (id = 1),
                     daily_goal INTEGER NULL,
-                    session_goal INTEGER NULL
+                    session_goal INTEGER NULL,
+                    last_selected_node_id TEXT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS scene_snapshots (
@@ -114,10 +120,16 @@ public sealed class ProjectDatabase : IDisposable
 
     private void MigrateMissingColumns()
     {
+        MigrateMissingColumns("nodes", MigratedColumns);
+        MigrateMissingColumns("project_settings", MigratedProjectSettingsColumns);
+    }
+
+    private void MigrateMissingColumns(string table, (string Name, string Definition)[] columns)
+    {
         var existingColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         using (var pragma = Connection.CreateCommand())
         {
-            pragma.CommandText = "PRAGMA table_info(nodes);";
+            pragma.CommandText = $"PRAGMA table_info({table});";
             using var reader = pragma.ExecuteReader();
             while (reader.Read())
             {
@@ -125,7 +137,7 @@ public sealed class ProjectDatabase : IDisposable
             }
         }
 
-        foreach (var (name, definition) in MigratedColumns)
+        foreach (var (name, definition) in columns)
         {
             if (existingColumns.Contains(name))
             {
@@ -133,7 +145,7 @@ public sealed class ProjectDatabase : IDisposable
             }
 
             using var alter = Connection.CreateCommand();
-            alter.CommandText = $"ALTER TABLE nodes ADD COLUMN {name} {definition};";
+            alter.CommandText = $"ALTER TABLE {table} ADD COLUMN {name} {definition};";
             alter.ExecuteNonQuery();
         }
     }

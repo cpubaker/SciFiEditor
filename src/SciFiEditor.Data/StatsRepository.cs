@@ -73,6 +73,23 @@ public sealed class StatsRepository
         _database.Connection.Execute(sql, new { DailyGoal = dailyGoal, SessionGoal = sessionGoal });
     }
 
+    public Guid? GetLastSelectedNodeId()
+    {
+        const string sql = "SELECT last_selected_node_id FROM project_settings WHERE id = 1";
+        var value = _database.Connection.QuerySingleOrDefault<string?>(sql);
+        return value is null ? null : Guid.Parse(value);
+    }
+
+    public void SetLastSelectedNodeId(Guid? nodeId)
+    {
+        const string sql = """
+            INSERT INTO project_settings (id, last_selected_node_id)
+            VALUES (1, @NodeId)
+            ON CONFLICT(id) DO UPDATE SET last_selected_node_id = excluded.last_selected_node_id
+            """;
+        _database.Connection.Execute(sql, new { NodeId = nodeId?.ToString() });
+    }
+
     private static string Format(DateOnly date) => date.ToString(DateFormat, CultureInfo.InvariantCulture);
 
     private static DailyStat MapRow(StatRow row) => new(

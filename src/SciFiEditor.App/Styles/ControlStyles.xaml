@@ -8,6 +8,12 @@
         <Setter Property="CaretBrush" Value="{DynamicResource AppWindowForegroundBrush}" />
         <Setter Property="SelectionBrush" Value="{DynamicResource AppAccentBrush}" />
         <Setter Property="Padding" Value="4,2" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Style.Triggers>
+            <Trigger Property="AcceptsReturn" Value="False">
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="ComboBoxItem">

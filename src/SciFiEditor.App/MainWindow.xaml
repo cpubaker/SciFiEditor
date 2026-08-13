@@ -178,6 +178,15 @@
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                             <Setter Property="Foreground" Value="{DynamicResource AppWindowForegroundBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsTrashNode}" Value="True">
+                                    <Setter Property="Margin" Value="0,10,0,0" />
+                                    <Setter Property="Padding" Value="4,6,0,2" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
+                                    <Setter Property="BorderThickness" Value="0,1,0,0" />
+                                    <Setter Property="Opacity" Value="0.7" />
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </TreeView.ItemContainerStyle>
                     <TreeView.ItemTemplate>
@@ -290,15 +299,17 @@
                     Visibility="{Binding IsFocusMode, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="8" DataContext="{Binding SelectedNode}">
-                        <TextBlock Text="{x:Static res:Strings.InspectorSynopsis}" Margin="0,0,0,4" />
+                        <TextBlock Text="{x:Static res:Strings.InspectorSynopsis}" Margin="0,0,0,4"
+                                   ToolTip="{x:Static res:Strings.InspectorSynopsisTooltip}" />
                         <TextBox Text="{Binding Synopsis, UpdateSourceTrigger=PropertyChanged}"
-                                 AcceptsReturn="True" TextWrapping="Wrap" Height="70"
+                                 AcceptsReturn="True" TextWrapping="Wrap" Height="60"
                                  VerticalScrollBarVisibility="Auto"
+                                 ToolTip="{x:Static res:Strings.InspectorSynopsisTooltip}"
                                  LostFocus="InspectorField_LostFocus" />
 
                         <TextBlock Text="{x:Static res:Strings.InspectorNotes}" Margin="0,12,0,4" />
                         <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
-                                 AcceptsReturn="True" TextWrapping="Wrap" Height="100"
+                                 AcceptsReturn="True" TextWrapping="Wrap" Height="220"
                                  VerticalScrollBarVisibility="Auto"
                                  LostFocus="InspectorField_LostFocus" />
 
