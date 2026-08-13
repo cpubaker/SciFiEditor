@@ -118,6 +118,8 @@ public static class Strings
     public static string DialogLinkUrl => Get("DialogLinkUrl");
     public static string DialogLinkText => Get("DialogLinkText");
     public static string DialogInsertLinkTitle => Get("DialogInsertLinkTitle");
+    public static string InspectorSynopsisTooltip => Get("InspectorSynopsisTooltip");
+    public static string SeedChapterTitle => Get("SeedChapterTitle");
 
     private static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? name;

@@ -123,4 +123,42 @@ public class StatsRepositoryTests : IDisposable
         goals.DailyGoal.Should().Be(800);
         goals.SessionGoal.Should().BeNull();
     }
+
+    [Fact]
+    public void GetLastSelectedNodeId_ReturnsNull_WhenNeverSet()
+    {
+        _repository.GetLastSelectedNodeId().Should().BeNull();
+    }
+
+    [Fact]
+    public void SetLastSelectedNodeId_ThenGet_RoundTrips()
+    {
+        var nodeId = Guid.NewGuid();
+
+        _repository.SetLastSelectedNodeId(nodeId);
+
+        _repository.GetLastSelectedNodeId().Should().Be(nodeId);
+    }
+
+    [Fact]
+    public void SetLastSelectedNodeId_DoesNotOverwriteGoals()
+    {
+        _repository.SetGoals(500, 250);
+
+        _repository.SetLastSelectedNodeId(Guid.NewGuid());
+
+        var goals = _repository.GetGoals();
+        goals.DailyGoal.Should().Be(500);
+        goals.SessionGoal.Should().Be(250);
+    }
+
+    [Fact]
+    public void SetLastSelectedNodeId_Null_ClearsPreviousValue()
+    {
+        _repository.SetLastSelectedNodeId(Guid.NewGuid());
+
+        _repository.SetLastSelectedNodeId(null);
+
+        _repository.GetLastSelectedNodeId().Should().BeNull();
+    }
 }

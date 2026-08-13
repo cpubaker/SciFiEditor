@@ -316,7 +316,7 @@
   <data name="SeedSceneContent" xml:space="preserve">
     <value>Ласкаво просимо до SciFiEditor!
 
-Це ваша перша сцена. Просто почніть друкувати тут — або видаліть цей текст і почніть власну історію.</value>
+Ця сцена знаходиться всередині «Розділ 1» — саме так організовується структура історії: Тека → Розділ → Сцена. Просто почніть друкувати тут — або видаліть цей текст і почніть власну історію.</value>
   </data>
   <data name="StartupTitle" xml:space="preserve">
     <value>SciFiEditor</value>
@@ -386,5 +386,11 @@
   </data>
   <data name="DialogInsertLinkTitle" xml:space="preserve">
     <value>Вставити посилання</value>
+  </data>
+  <data name="InspectorSynopsisTooltip" xml:space="preserve">
+    <value>Короткий опис того, що відбувається в цій сцені чи розділі — кілька речень для швидкого огляду структури проєкту.</value>
+  </data>
+  <data name="SeedChapterTitle" xml:space="preserve">
+    <value>Розділ 1</value>
   </data>
 </root>

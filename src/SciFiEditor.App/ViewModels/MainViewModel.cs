@@ -159,6 +159,11 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         }
 
         SelectedNode = newSelection;
+        if (newSelection is not { IsTrashNode: true })
+        {
+            _projectService.Current?.Stats.SetLastSelectedNodeId(newSelection?.Id);
+        }
+
         IsSceneSelected = newSelection?.NodeType == NodeType.Scene;
         SceneWordCount = newSelection?.WordCount ?? 0;
         SceneCharCount = newSelection?.CharCount ?? 0;
@@ -430,22 +435,26 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
             _projectService.CreateProject(dialog.ProjectLocation, dialog.ProjectName);
             LoadTree(resetSessionBaseline: true);
 
-            var scene = _nodeService.AddNode(NodeType.Scene, Strings.BinderNewSceneTitle, null);
+            var chapter = _nodeService.AddNode(NodeType.Chapter, Strings.SeedChapterTitle, null);
+            var scene = _nodeService.AddNode(NodeType.Scene, Strings.BinderNewSceneTitle, chapter.Id);
             await _fileService.WriteSceneAsync(_projectService.Current!.RootPath, scene.Id, Strings.SeedSceneContent);
 
-            var vm = new BinderNodeViewModel(scene, OnRenameCommitted, OnInspectorCommitted);
+            var chapterVm = new BinderNodeViewModel(chapter, OnRenameCommitted, OnInspectorCommitted) { IsExpanded = true };
+            var sceneVm = new BinderNodeViewModel(scene, OnRenameCommitted, OnInspectorCommitted);
+            chapterVm.Children.Add(sceneVm);
+
             var trashIndex = RootNodes.ToList().FindIndex(n => n.IsTrashNode);
             if (trashIndex >= 0)
             {
-                RootNodes.Insert(trashIndex, vm);
+                RootNodes.Insert(trashIndex, chapterVm);
             }
             else
             {
-                RootNodes.Add(vm);
+                RootNodes.Add(chapterVm);
             }
 
-            vm.IsSelected = true;
-            await OnBinderSelectionChangedAsync(vm);
+            sceneVm.IsSelected = true;
+            await OnBinderSelectionChangedAsync(sceneVm);
         }
         catch (Exception ex)
         {
@@ -656,6 +665,12 @@ public sealed partial class MainViewModel : ObservableObject, IDropTarget
         {
             restored.IsSelected = true;
             _ = OnBinderSelectionChangedAsync(restored);
+        }
+        else if (_projectService.Current?.Stats.GetLastSelectedNodeId() is Guid lastId
+                 && FindNode(RootNodes, lastId) is { } restoredFromLastSession)
+        {
+            restoredFromLastSession.IsSelected = true;
+            _ = OnBinderSelectionChangedAsync(restoredFromLastSession);
         }
         else
         {

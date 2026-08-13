@@ -16,11 +16,16 @@
                 </Grid.RowDefinitions>
                 <ListBox Grid.Row="0" ItemsSource="{Binding Characters}" DisplayMemberPath="Name"
                          SelectedItem="{Binding SelectedCharacter}" Margin="0,0,0,8" />
-                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <TextBox Text="{Binding NewCharacterName, UpdateSourceTrigger=PropertyChanged}" Width="150" Margin="0,0,8,0" />
-                    <Button Content="{x:Static res:Strings.EntityAddButton}" Command="{Binding AddCharacterCommand}" MinWidth="80" Margin="0,0,8,0" />
-                    <Button Content="{x:Static res:Strings.EntityDeleteButton}" Command="{Binding DeleteCharacterCommand}" MinWidth="80" />
-                </StackPanel>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding NewCharacterName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0" />
+                    <Button Grid.Column="1" Content="{x:Static res:Strings.EntityAddButton}" Command="{Binding AddCharacterCommand}" MinWidth="80" Margin="0,0,8,0" />
+                    <Button Grid.Column="2" Content="{x:Static res:Strings.EntityDeleteButton}" Command="{Binding DeleteCharacterCommand}" MinWidth="80" />
+                </Grid>
             </Grid>
         </TabItem>
         <TabItem Header="{x:Static res:Strings.EntityTabLocations}">
@@ -31,11 +36,16 @@
                 </Grid.RowDefinitions>
                 <ListBox Grid.Row="0" ItemsSource="{Binding Locations}" DisplayMemberPath="Name"
                          SelectedItem="{Binding SelectedLocation}" Margin="0,0,0,8" />
-                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <TextBox Text="{Binding NewLocationName, UpdateSourceTrigger=PropertyChanged}" Width="150" Margin="0,0,8,0" />
-                    <Button Content="{x:Static res:Strings.EntityAddButton}" Command="{Binding AddLocationCommand}" MinWidth="80" Margin="0,0,8,0" />
-                    <Button Content="{x:Static res:Strings.EntityDeleteButton}" Command="{Binding DeleteLocationCommand}" MinWidth="80" />
-                </StackPanel>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding NewLocationName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0" />
+                    <Button Grid.Column="1" Content="{x:Static res:Strings.EntityAddButton}" Command="{Binding AddLocationCommand}" MinWidth="80" Margin="0,0,8,0" />
+                    <Button Grid.Column="2" Content="{x:Static res:Strings.EntityDeleteButton}" Command="{Binding DeleteLocationCommand}" MinWidth="80" />
+                </Grid>
             </Grid>
         </TabItem>
     </TabControl>
