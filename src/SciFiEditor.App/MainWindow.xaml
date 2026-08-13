@@ -240,12 +240,39 @@
                         <RichTextBox x:Name="SceneEditor" Grid.Row="2"
                                      behaviors:RichTextBoxMarkdownBehavior.BindableMarkdown="{Binding EditorContent, Mode=TwoWay}"
                                      IsEnabled="{Binding IsSceneSelected}"
+                                     Visibility="{Binding IsSceneSelected, Converter={StaticResource BoolToVisibilityConverter}}"
                                      Background="{DynamicResource AppWindowBackgroundBrush}"
                                      Foreground="{DynamicResource AppWindowForegroundBrush}"
                                      BorderThickness="0"
                                      FontFamily="Segoe UI" FontSize="14"
                                      AcceptsReturn="True" AcceptsTab="True"
                                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" />
+                        <Grid Grid.Row="2" DataContext="{Binding SelectedNode}"
+                              Visibility="{Binding DataContext.IsContainerNodeSelected, ElementName=RootWindow, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="{Binding Title}" FontSize="22" FontWeight="Bold" Margin="16,16,16,8" />
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Children}" Margin="16,0,16,16">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.SelectChildCommand, ElementName=RootWindow}"
+                                                    CommandParameter="{Binding}"
+                                                    HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                                                    Margin="0,0,0,4" Padding="8,6">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                                                    <TextBlock Text="{Binding WordCount, StringFormat=' — {0} слів'}" Opacity="0.7" Margin="6,0,0,0"
+                                                               Visibility="{Binding IsTrashNode, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
                     </Grid>
                 </TabItem>
                 <TabItem Header="{x:Static res:Strings.TabBoard}">

@@ -15,7 +15,8 @@ public sealed class ProjectDatabase : IDisposable
         ("target_word_count", "INTEGER NULL"),
         ("word_count", "INTEGER NOT NULL DEFAULT 0"),
         ("char_count", "INTEGER NOT NULL DEFAULT 0"),
-        ("include_in_compile", "INTEGER NOT NULL DEFAULT 1")
+        ("include_in_compile", "INTEGER NOT NULL DEFAULT 1"),
+        ("is_expanded", "INTEGER NOT NULL DEFAULT 0")
     ];
 
     private static readonly (string Name, string Definition)[] MigratedProjectSettingsColumns =
@@ -62,7 +63,8 @@ public sealed class ProjectDatabase : IDisposable
                     target_word_count INTEGER NULL,
                     word_count INTEGER NOT NULL DEFAULT 0,
                     char_count INTEGER NOT NULL DEFAULT 0,
-                    include_in_compile INTEGER NOT NULL DEFAULT 1
+                    include_in_compile INTEGER NOT NULL DEFAULT 1,
+                    is_expanded INTEGER NOT NULL DEFAULT 0
                 );
                 CREATE INDEX IF NOT EXISTS ix_nodes_parent_id ON nodes(parent_id);
 

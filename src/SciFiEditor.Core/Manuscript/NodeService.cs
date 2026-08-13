@@ -79,6 +79,8 @@ public sealed class NodeService
 
     public int GetProjectWordCount() => Project.Nodes.GetProjectWordCount();
 
+    public void SetExpanded(Guid id, bool isExpanded) => Project.Nodes.UpdateExpanded(id, isExpanded);
+
     public ManuscriptNode Duplicate(Guid id)
     {
         if (id == WellKnownNodeIds.Trash)

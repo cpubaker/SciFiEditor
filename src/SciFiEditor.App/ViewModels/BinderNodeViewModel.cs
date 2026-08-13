@@ -9,15 +9,18 @@ public sealed partial class BinderNodeViewModel : ObservableObject
 {
     private readonly Action<BinderNodeViewModel, string>? _onRenameCommitted;
     private readonly Action<BinderNodeViewModel>? _onInspectorCommitted;
+    private readonly Action<BinderNodeViewModel>? _onExpandedChanged;
 
     public BinderNodeViewModel(
         ManuscriptNode node,
         Action<BinderNodeViewModel, string>? onRenameCommitted = null,
-        Action<BinderNodeViewModel>? onInspectorCommitted = null)
+        Action<BinderNodeViewModel>? onInspectorCommitted = null,
+        Action<BinderNodeViewModel>? onExpandedChanged = null)
     {
         Node = node;
         _onRenameCommitted = onRenameCommitted;
         _onInspectorCommitted = onInspectorCommitted;
+        _onExpandedChanged = onExpandedChanged;
         _title = ComputeDisplayTitle(node);
         _editTitle = _title;
         _synopsis = node.Synopsis;
@@ -28,6 +31,7 @@ public sealed partial class BinderNodeViewModel : ObservableObject
         _wordCount = node.WordCount;
         _charCount = node.CharCount;
         _includeInCompile = node.IncludeInCompile;
+        _isExpanded = node.IsExpanded;
     }
 
     public ManuscriptNode Node { get; private set; }
@@ -52,6 +56,12 @@ public sealed partial class BinderNodeViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isExpanded;
+
+    partial void OnIsExpandedChanged(bool value)
+    {
+        Node.IsExpanded = value;
+        _onExpandedChanged?.Invoke(this);
+    }
 
     [ObservableProperty]
     private string _synopsis;
