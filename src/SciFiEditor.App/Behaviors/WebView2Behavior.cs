@@ -12,15 +12,35 @@ public static class WebView2Behavior
 
     public static void SetBindableHtml(DependencyObject obj, string value) => obj.SetValue(BindableHtmlProperty, value);
 
-    private static async void OnBindableHtmlChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnBindableHtmlChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is not WebView2 webView)
         {
             return;
         }
 
-        var html = e.NewValue as string ?? string.Empty;
+        if (!webView.IsLoaded)
+        {
+            // A WebView2 on an unselected TabItem isn't part of the visual tree yet, so it has no
+            // HWND to initialize CoreWebView2 against. Defer navigation until it actually loads,
+            // and always read the latest bound value at that point rather than the one from now.
+            webView.Loaded -= WebView_Loaded;
+            webView.Loaded += WebView_Loaded;
+            return;
+        }
 
+        _ = NavigateAsync(webView);
+    }
+
+    private static void WebView_Loaded(object sender, RoutedEventArgs e)
+    {
+        var webView = (WebView2)sender;
+        webView.Loaded -= WebView_Loaded;
+        _ = NavigateAsync(webView);
+    }
+
+    private static async Task NavigateAsync(WebView2 webView)
+    {
         try
         {
             if (webView.CoreWebView2 is null)
@@ -28,7 +48,7 @@ public static class WebView2Behavior
                 await webView.EnsureCoreWebView2Async();
             }
 
-            webView.CoreWebView2?.NavigateToString(html);
+            webView.CoreWebView2?.NavigateToString(GetBindableHtml(webView));
         }
         catch (Exception)
         {
