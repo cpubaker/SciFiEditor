@@ -4,8 +4,9 @@
         xmlns:res="clr-namespace:SciFiEditor.App.Resources"
         xmlns:controls="clr-namespace:SciFiEditor.App.Controls"
         Title="{x:Static res:Strings.StatsWindowTitle}"
-        Height="420" Width="620"
+        Width="620" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
         Background="{DynamicResource AppWindowBackgroundBrush}"
         Foreground="{DynamicResource AppWindowForegroundBrush}">
     <Grid Margin="16">
@@ -15,7 +16,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="{x:Static res:Strings.StatsHeatmapLabel}" FontWeight="Bold" Margin="0,0,0,6" />
