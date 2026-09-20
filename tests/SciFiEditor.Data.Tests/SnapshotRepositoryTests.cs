@@ -52,7 +52,7 @@ public class SnapshotRepositoryTests : IDisposable
     {
         var nodeId = Guid.NewGuid();
 
-        _repository.HasSnapshotToday(nodeId, "Auto", DateOnly.FromDateTime(DateTime.UtcNow)).Should().BeFalse();
+        _repository.HasSnapshotToday(nodeId, "Auto", DateOnly.FromDateTime(DateTime.Now)).Should().BeFalse();
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class SnapshotRepositoryTests : IDisposable
         var nodeId = Guid.NewGuid();
         _repository.Insert(nodeId, DateTime.UtcNow, "Auto", "content");
 
-        _repository.HasSnapshotToday(nodeId, "Auto", DateOnly.FromDateTime(DateTime.UtcNow)).Should().BeTrue();
+        _repository.HasSnapshotToday(nodeId, "Auto", DateOnly.FromDateTime(DateTime.Now)).Should().BeTrue();
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class SnapshotRepositoryTests : IDisposable
         var nodeId = Guid.NewGuid();
         _repository.Insert(nodeId, DateTime.UtcNow, "Manual", "content");
 
-        _repository.HasSnapshotToday(nodeId, "Auto", DateOnly.FromDateTime(DateTime.UtcNow)).Should().BeFalse();
+        _repository.HasSnapshotToday(nodeId, "Auto", DateOnly.FromDateTime(DateTime.Now)).Should().BeFalse();
     }
 
     [Fact]
@@ -79,6 +79,33 @@ public class SnapshotRepositoryTests : IDisposable
         var nodeId = Guid.NewGuid();
         _repository.Insert(nodeId, DateTime.UtcNow.AddDays(-3), "Auto", "content");
 
-        _repository.HasSnapshotToday(nodeId, "Auto", DateOnly.FromDateTime(DateTime.UtcNow)).Should().BeFalse();
+        _repository.HasSnapshotToday(nodeId, "Auto", DateOnly.FromDateTime(DateTime.Now)).Should().BeFalse();
+    }
+
+    // The real caller (SnapshotService.RecordAutoSnapshotIfNeeded) computes "today" from local time,
+    // not UTC, while created_at_utc is stored in UTC. Near local midnight these two calendar dates
+    // can differ depending on the machine's UTC offset. These two boundary instants -- local
+    // day-start and local day-end -- reproduce that mismatch regardless of which direction (east or
+    // west of UTC) the test machine's offset happens to be.
+    [Fact]
+    public void HasSnapshotToday_SnapshotJustAfterLocalMidnight_MatchesLocalToday()
+    {
+        var nodeId = Guid.NewGuid();
+        var localToday = DateOnly.FromDateTime(DateTime.Now);
+        var justAfterLocalMidnight = new DateTime(localToday.Year, localToday.Month, localToday.Day, 0, 0, 1, DateTimeKind.Local);
+        _repository.Insert(nodeId, justAfterLocalMidnight.ToUniversalTime(), "Auto", "content");
+
+        _repository.HasSnapshotToday(nodeId, "Auto", localToday).Should().BeTrue();
+    }
+
+    [Fact]
+    public void HasSnapshotToday_SnapshotJustBeforeLocalMidnight_MatchesLocalToday()
+    {
+        var nodeId = Guid.NewGuid();
+        var localToday = DateOnly.FromDateTime(DateTime.Now);
+        var justBeforeNextLocalMidnight = new DateTime(localToday.Year, localToday.Month, localToday.Day, 23, 59, 59, DateTimeKind.Local);
+        _repository.Insert(nodeId, justBeforeNextLocalMidnight.ToUniversalTime(), "Auto", "content");
+
+        _repository.HasSnapshotToday(nodeId, "Auto", localToday).Should().BeTrue();
     }
 }

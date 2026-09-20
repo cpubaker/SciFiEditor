@@ -54,9 +54,13 @@ public sealed class SnapshotRepository
 
     public bool HasSnapshotToday(Guid nodeId, string label, DateOnly today)
     {
+        // created_at_utc is stored in UTC, but `today` is the caller's local calendar day
+        // (matching how the rest of the app treats "today" everywhere else, e.g. daily_stats).
+        // Comparing raw UTC date substrings against a local date mismatches for hours around
+        // local midnight whenever the UTC offset isn't zero, so convert to local time first.
         const string sql = """
             SELECT COUNT(1) FROM scene_snapshots
-            WHERE node_id = @NodeId AND label = @Label AND substr(created_at_utc, 1, 10) = @Today
+            WHERE node_id = @NodeId AND label = @Label AND date(created_at_utc, 'localtime') = @Today
             """;
         var count = _database.Connection.ExecuteScalar<int>(sql, new
         {
